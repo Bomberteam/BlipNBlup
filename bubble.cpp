@@ -15,16 +15,26 @@ Bubble::Bubble() :
     SetHitdX(GetWidth()/2);
     SetHitdY(GetHeight()/2);
     QImage bubble_image = QImage(":/graphics/bubbles.png");
-    AddSprite(bubble_image.copy(
-                        0, 0,
+    for (int i = 0; i < 2; i++){
+        AddSprite(bubble_image.copy(
+                        i*sprite_height, 0,
                         sprite_height, sprite_height)
-    );
+        );
+    }
 }
 
 //AGE BUBBLE AND RETURN TRUE ON OLD
 bool Bubble::Age() noexcept{
     ++m_age;
-    if (m_age > 201-(Randomize() / 128) ) return true;
+    if (m_age > 176-(Randomize() / 128) ) {
+        SetCurrentFrame(1);
+        SetWidth(GetWidth()+2);
+        SetHeight(GetHeight()+2);
+    }
+    if (m_age > 180-(Randomize() / 128) ) {
+
+        return true;
+    }
     else return false;
 }
 
@@ -43,7 +53,7 @@ void Bubble::ApplyMovement(long ticks, const std::vector<double>& sine) noexcept
 void Bubble::Draw(QPainter * const painter, const int ticks, const std::vector<double>& sine) noexcept
 {
     int phase = 3 * ticks + Randomize();
-    QImage sprite = GetSprite(0);
+    QImage sprite = GetSprite(GetCurrentFrame());
     const double width  = GetWidth()  - abs(GetXSpeed())/2 + (2*sine[phase%512]);
     const double height = GetHeight() + abs(GetXSpeed())/4 + (2*sine[phase%512]);
     const double dx = (GetWidth() - width)  / 2.0;

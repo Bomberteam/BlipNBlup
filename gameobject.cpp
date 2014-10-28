@@ -20,13 +20,13 @@ GameObject::GameObject() :
     m_rot(0.0),
     m_rot_speed(0.0),
 
-    m_step(3),
+    m_step(2),
     m_dead(false),
     m_on_ground(false),
     m_facing_right(true),
 
     m_current_frame(0),
-    m_frame_progression(0)
+    m_animframe(0)
 {
     m_charge = m_charged;
 }
@@ -150,6 +150,7 @@ void GameObject::Draw(QPainter * painter) noexcept
     int device_width = painter->device()->width();
     int device_height = painter->device()->height();
     QTransform matrix;
+    matrix.rotate(GetRotation());
     matrix.scale(1-(2*!m_facing_right), 1);
     QPixmap sprite_t = QPixmap::fromImage( GetSprite(GetCurrentFrame()).transformed(matrix) );
     const int width  = GetWidth();

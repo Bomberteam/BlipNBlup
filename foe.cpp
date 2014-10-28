@@ -19,7 +19,7 @@ void Foe::Catch() noexcept {m_caught = true; m_escape_ticks = 0;}
 
 
 //FOE ESCAPE FUNCTION
-void Foe::Escape() noexcept
+bool Foe::Escape() noexcept
 {
     if (std::floor(GetXSpeed() + 0.5) == 0){
         ++m_escape_ticks;
@@ -33,7 +33,9 @@ void Foe::Escape() noexcept
         SetOnGround(false);
         SetRotation(0);
         SetRotSpeed(0);
+        return true;
     }
+    return false;
 }
 
 
@@ -42,7 +44,7 @@ void Foe::Fall(QPixmap const background,const double grav) noexcept
 {
     int check_x = (GetX()+(GetWidth()/2));
     check_x = check_x%background.width();
-    int check_y = (GetY()+(GetHeight())-8);
+    int check_y = (GetY()+(GetHeight())-11);
     check_y = check_y%background.height();
     const QRgb floorpixel = background.toImage().pixel( check_x , check_y );
     const int red = qRed(floorpixel);
@@ -57,7 +59,7 @@ void Foe::Fall(QPixmap const background,const double grav) noexcept
             const QRgb floorpixel = background.toImage().pixel( check_x , check_y);
             const int red = qRed(floorpixel);
             if (red % 2){
-                if (GetYSpeed() > 1 && IsCaught()){ SetYSpeed(-GetYSpeed()/2.0); }
+                if (GetYSpeed() > 1 && IsCaught()){ SetYSpeed(-GetYSpeed()/3.0); }
                 else { SetYSpeed(0); }
                 SetY( GetY() + i );
                 SetOnGround(true);
@@ -147,8 +149,7 @@ void Foe::Draw(QPainter * painter) const noexcept
                     sprite_t);
         if (IsCaught()) painter->drawPixmap(
                         GetX()+bubble_dx+device_width, GetY()+bubble_dy+device_height,
-                        bubble_width, bubble_height,
-                        m_bubble);
+                        bubble_width, bubble_height, m_bubble);
     }
     if(GetX() > device_width - width && GetY() < 0){ painter->drawPixmap(
                     GetX()+dx-device_width, GetY()+dy+device_height,

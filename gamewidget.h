@@ -41,6 +41,10 @@ private:
     std::vector<Bubble*> bubbles;
     std::vector<Wasp*>   wasps;
 
+    QSound catchSound;
+    QSound escapeSound;
+    QSound endBubble;
+
 private slots:
     void    OnTimer();
 };

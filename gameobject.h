@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QImage>
 #include <QPixmap>
+#include <QSound>
 
 class GameObject : public QObject
 {
@@ -17,8 +18,8 @@ private:
 
     double  m_x;
     double  m_y;
-    int     m_width;//
-    int     m_height;//
+    int     m_width;
+    int     m_height;
     int     m_hit_dx;
     int     m_hit_dy;
     double  m_x_speed;
@@ -36,8 +37,9 @@ private:
     std::vector<QImage> m_sprites;
     int m_current_frame;
 
+
 protected:
-    float m_frame_progression;
+    float m_animframe;
 
 public:
     void    SetX(const double x) noexcept;

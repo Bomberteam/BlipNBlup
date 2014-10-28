@@ -4,11 +4,14 @@
 
 Player::Player(bool blup) :
     GameObject(),
-    m_pressed_up(false),
-    m_pressed_left(false),
-    m_pressed_right(false),
-    m_pressed_down(false),
-    m_jump(12)
+    m_pressed_up(false), m_pressed_down(false),
+    m_pressed_left(false), m_pressed_right(false),
+    m_pressed_fire(false),
+    m_jump(10), m_walk_speed(1.8),
+
+    current_animation(Stand),
+    //jumpSound("://audio/jump.wav"),
+    shootSound("://audio/shootbubble.wav")
 {
     int sprite_size = 64;
     SetHitdX(GetWidth()/2);
@@ -22,18 +25,21 @@ Player::Player(bool blup) :
 }
 
 bool Player::GetUp()    const noexcept  {return m_pressed_up;}
+bool Player::GetDown()  const noexcept  {return m_pressed_down;}
 bool Player::GetLeft()  const noexcept  {return m_pressed_left;}
 bool Player::GetRight() const noexcept  {return m_pressed_right;}
-bool Player::GetDown()  const noexcept  {return m_pressed_down;}
+bool Player::GetFire()  const noexcept  {return m_pressed_fire;}
 
 void Player::SetUp(bool state) noexcept     {m_pressed_up    = state;}
+void Player::SetDown(bool state) noexcept   {m_pressed_down  = state;}
 void Player::SetLeft(bool state) noexcept   {m_pressed_left  = state;}
 void Player::SetRight(bool state) noexcept  {m_pressed_right = state;}
-void Player::SetDown(bool state) noexcept   {m_pressed_down  = state;}
+void Player::SetFire(bool state) noexcept   {m_pressed_fire  = state;}
 
 //SHOOT BUBBLE
 Bubble * Player::Shoot()
 {
+    shootSound.play();
     ResetCharge();
     Bubble * bubble = new Bubble();
     bubble->SetX(GetX());
@@ -43,27 +49,33 @@ Bubble * Player::Shoot()
     return bubble;
 }
 
-
-
 //APPLY INPUT EFFECTS
-void Player::ApplyKeys() noexcept{
+void Player::ApplyKeys(std::vector<Bubble*> &bubbles) noexcept{
     if (IsAlive()){
         //JUMP
         if (GetUp() && IsOnGround()){
+            //jumpSound.play(); //Too square
+            current_animation = Jump;
             SetOnGround(false);
             SetYSpeed(-m_jump);
         }
         //FORCE LEFT
         if (GetLeft()){
             FaceLeft();
-            if (GetXSpeed() > -GetStep()){ SetXSpeed( GetXSpeed() - (0.25 + (0.75*IsOnGround())) );}
+            if (GetXSpeed() > -m_walk_speed){ SetXSpeed( GetXSpeed() - (0.25 + (0.75*IsOnGround())) );}
         }
         //FORCE RIGHT
         if (GetRight()){
             FaceRight();
-            if (GetXSpeed() <  GetStep()){ SetXSpeed( GetXSpeed() + (0.25 + (0.75*IsOnGround())) );}
+            if (GetXSpeed() <  m_walk_speed){ SetXSpeed( GetXSpeed() + (0.25 + (0.75*IsOnGround())) );}
+        }
+        //SHOOT
+        if (GetFire() && GetChargeAmount() > 1.0){
+            current_animation = Fire;
+            bubbles.push_back(Shoot());
         }
     }
+    else current_animation = Dead;
 }
 
 //MOVE PLAYER
@@ -110,25 +122,34 @@ void Player::ApplyMovement(const QPixmap& background)
     if (IsOnGround()){ SetXSpeed(GetXSpeed() * 0.7); }
 }
 
+//PLAY ANIMATION
 void Player::Animate() noexcept{
-    double abs_x_speed = GetXSpeed();
-    if (abs_x_speed < 0) abs_x_speed = -abs_x_speed;
-    m_frame_progression += (abs_x_speed/10.0);
+    if (IsAlive()){
+        double abs_x_speed = GetXSpeed();
+        if (abs_x_speed < 0) abs_x_speed = -abs_x_speed;
+        m_animframe += (abs_x_speed/8.0);
 
-    int next_frame = GetCurrentFrame();
-    if (m_frame_progression > 1){
-        m_frame_progression = 0;
-        next_frame = GetCurrentFrame()+1;
-        if (next_frame >= GetSpritesAmount()-2) next_frame = 0;
+        if (current_animation == Fire){
+            SetCurrentFrame(Fire);
+            if (GetChargeAmount() > 0.3) current_animation = Stand;
+        }
+        else if (IsOnGround()){
+            if (abs_x_speed < 0.5) current_animation = Stand;
+            else current_animation = Walk;
+        }
+
+        if (current_animation == Jump)  SetCurrentFrame(2);
+        if (current_animation == Stand) SetCurrentFrame(Stand);
+        if (current_animation == Walk){
+            if (m_animframe >= 4) m_animframe = 0;
+            switch ((int)floor((double)m_animframe)){
+                case 0 : SetCurrentFrame(0); break;
+                case 1 : SetCurrentFrame(1); break;
+                case 2 : SetCurrentFrame(0); break;
+                case 3 : SetCurrentFrame(2); break;
+                default: SetCurrentFrame(0); break;
+            }
+        }
     }
-    if (!IsAlive()){
-        next_frame = 4;
-    }
-    else if (GetChargeAmount() < 0.3){
-        next_frame = 3;
-    }
-    else if (abs_x_speed < 1){
-        next_frame = 0;
-    }
-    SetCurrentFrame(next_frame);
+    else SetCurrentFrame(Dead);
 }

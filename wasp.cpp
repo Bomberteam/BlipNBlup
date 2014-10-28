@@ -31,8 +31,8 @@ void Wasp::ApplyMovement(const int ticks, const std::vector<double>& sine)
     }
     else SetCurrentFrame(GetSpritesAmount()-1);
     if (IsOnGround()){
-        SetXSpeed( GetXSpeed() * 0.97 );
-        SetRotSpeed( 3 * GetXSpeed() );
+        SetXSpeed( GetXSpeed() * 0.95 );
+        SetRotSpeed( 3.8 * GetXSpeed() );
     }
     SetX(GetX()+GetXSpeed());
     SetY(GetY()+GetYSpeed());
@@ -40,9 +40,9 @@ void Wasp::ApplyMovement(const int ticks, const std::vector<double>& sine)
 }
 
 void Wasp::Animate() noexcept{
-    if (!IsCaught()) m_frame_progression += 0.5;
-    if (m_frame_progression > 1){
-        m_frame_progression = 0;
+    if (!IsCaught()) m_animframe += 0.5;
+    if (m_animframe > 1){
+        m_animframe = 0;
         int next_frame = GetCurrentFrame()+1;
         if (next_frame > 1) next_frame = 0;
         SetCurrentFrame(next_frame);

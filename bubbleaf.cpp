@@ -15,7 +15,7 @@ Bubbleaf::Bubbleaf() :
     SetHitdY(GetHeight()/2);
     QImage bubble_image = QImage(":/graphics/bubbles.png");
     AddSprite(bubble_image.copy(
-                        sprite_height, 0,
+                        sprite_height*2, 0,
                         sprite_height*3, sprite_height)
     );
 }
@@ -23,10 +23,10 @@ Bubbleaf::Bubbleaf() :
 //MOVE BUBBLEAF
 void Bubbleaf::ApplyMovement(const int ticks, const std::vector<double>& sine) noexcept
 {
-    SetXSpeed(GetXSpeed() * 0.98);
+    SetXSpeed(GetXSpeed() * 0.92);
 
     int phase = floor( (1.25*ticks) + Randomize() );
-    SetYSpeed( 0.11 * sine[phase%512] );
+    SetYSpeed( 0.05 * sine[phase%512] );
 
     SetX( GetX()+GetXSpeed() );
     SetY( GetY()+GetYSpeed() );

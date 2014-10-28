@@ -5,5 +5,11 @@
         <file>graphics/spider.png</file>
         <file>graphics/blipnblup.png</file>
         <file>graphics/bubbles.png</file>
+        <file>audio/catchfoe.wav</file>
+        <file>audio/drop.wav</file>
+        <file>audio/endbubble.wav</file>
+        <file>audio/freefoe.wav</file>
+        <file>audio/jump.wav</file>
+        <file>audio/shootbubble.wav</file>
     </qresource>
 </RCC>
