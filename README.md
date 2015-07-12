@@ -1,4 +1,4 @@
-blipnblup
+#:four_leaf_clover: Blip 'n Blup's Skyward Adventures
 =========
 
-A bubble bobble inspired platform game
+A Bubble Bobble inspired platform game developed in Qt.
