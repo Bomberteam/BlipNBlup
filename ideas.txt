@@ -1,9 +1,9 @@
 - Adventure Levels and Worlds:
     * Beach
     * Jungle
-    * "Loofbos"
-    * "Naaldbos"
-    * Snow
+    * Leafy forest
+    * Prickly forest
+    * Snowy peaks
     * Lost temple
     * Volcano
     * Spaceship
@@ -14,17 +14,7 @@
     * Collector
     * Survival (waves of creatures)
 + Angry creatures on bubble escape
-    @ Anger as double with cooldown  <---
-- Seperate collision image to allow: <--
-    * Moving platforms               <-
-    * Slopes                         <
-    * Slippery surfaces
-    * Wind
-    * Hazards
-
-Mandelbulb 3D Fractal backgrounds? For bonus levels?
-
-Goal
+    @ Anger as float with cooldown  <---
 
 Controller support
 
