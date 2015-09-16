@@ -32,6 +32,7 @@ class Player : public Object
     OBJECT(Player);
 public:
     Player(Context *context, MasterControl *masterControl, bool blip = true);
+    void SetMovement(Vector2 movement) { movement_ = movement.Normalized(); }
 private:
     MasterControl * masterControl_;
     bool blip_;
@@ -41,6 +42,9 @@ private:
     CollisionShape* collider_;
     AnimationController* animCtrl_;
     float blink_;
+
+    float walkSpeed_;
+    Vector2 movement_;
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 };

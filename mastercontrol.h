@@ -25,8 +25,9 @@
 
 using namespace Urho3D;
 
-class BnBCam;
 class InputMaster;
+class BnBCam;
+class Player;
 
 typedef struct GameWorld
 {
@@ -63,18 +64,24 @@ public:
     SharedPtr<ResourceCache> cache_;
     SharedPtr<Graphics> graphics_;
 
-    /// Setup before engine initialization. Modifies the engine paramaters.
-    virtual void Setup();
-    /// Setup after engine initialization.
-    virtual void Start();
-    /// Cleanup after the main loop. Called by Application.
-    virtual void Stop();
+    Player* GetPlayer(int id = 1) {
+        assert(id == 1 || id == 2);
+        switch (id){
+        case 1: return blip_; break;
+        case 2: return blup_; break;
+        default: break;}}
 
+    virtual void Setup();
+    virtual void Start();
+    virtual void Stop();
     void Exit();
 private:
     SharedPtr<UI> ui_;
     SharedPtr<Renderer> renderer_;
     SharedPtr<XMLFile> defaultStyle_;
+
+    Player* blip_;
+    Player* blup_;
 
     void CreateConsoleAndDebugHud();
     void CreateScene();

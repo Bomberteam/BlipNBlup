@@ -110,6 +110,9 @@ void MasterControl::CreateScene()
     groundModel->SetModel(cache_->GetResource<Model>("Resources/Models/Ground.mdl"));
     groundModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
     groundModel->SetCastShadows(true);
+    groundNode->CreateComponent<RigidBody>();
+    CollisionShape* groundCollider = groundNode->CreateComponent<CollisionShape>();
+    groundCollider->SetBox(Vector3(10.0f, 2.0f, 10.0f), Vector3::DOWN);
 
     //Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = world_.scene_->CreateChild("DirectionalLight");
@@ -147,10 +150,10 @@ void MasterControl::CreateScene()
     }
 
     //Create a player
-    Player* blip = new Player(context_, this, true);
-    blip->rootNode_->SetPosition(Vector3::LEFT*5.0f);
-    Player* blup = new Player(context_, this, false);
-    blup->rootNode_->SetPosition(Vector3::RIGHT*5.0f);
+    Player* blip_ = new Player(context_, this, true);
+    blip_->rootNode_->SetPosition(Vector3::LEFT*5.0f);
+    Player* blup_ = new Player(context_, this, false);
+    blup_->rootNode_->SetPosition(Vector3::RIGHT*5.0f);
 
     //Create camera
     world_.camera = new BnBCam(context_, this);

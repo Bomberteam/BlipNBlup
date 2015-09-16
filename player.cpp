@@ -22,7 +22,9 @@
 Player::Player(Context *context, MasterControl *masterControl, bool blip) : Object(context),
     masterControl_{masterControl},
     blip_{blip},
-    blink_{0.0f}
+    blink_{0.0f},
+    walkSpeed_{230.0f},
+    movement_{Vector2::ZERO}
 {
     rootNode_ = masterControl->world_.scene_->CreateChild("Player");
     if (blip_) rootNode_->SetName("Blip");
@@ -40,6 +42,8 @@ Player::Player(Context *context, MasterControl *masterControl, bool blip) : Obje
     animCtrl_->PlayExclusive("Resources/Models/Walk.ani", 0, true);
 
     rigidBody_ = rootNode_->CreateComponent<RigidBody>();
+    rigidBody_->SetMass(1.0f);
+    rigidBody_->SetAngularFactor(Vector3::UP);
     collider_ = rootNode_->CreateComponent<CollisionShape>();
     collider_->SetCapsule(3.0f, 3.0f, Vector3::UP*1.5f);
 
@@ -48,11 +52,12 @@ Player::Player(Context *context, MasterControl *masterControl, bool blip) : Obje
 
 void Player::HandleUpdate(StringHash eventType, VariantMap &eventData)
 {
-    rootNode_->Rotate(Quaternion(eventData[Update::P_TIMESTEP].GetFloat() * 23.0f, Vector3::UP));
+    float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
+    rootNode_->Rotate(Quaternion(timeStep * 23.0f, Vector3::UP));
     //animCtrl_->SetSpeed("Resources/Models/Walk.ani", rigidBody_->GetLinearVelocity().Length());
     if (blink_ < 0.0001f && !Random(23)) blink_ = 1.0f;
     blink_ *= 0.9f;
     model_->SetMorphWeight(0, blink_);
+
+    rigidBody_->ApplyForce(timeStep * walkSpeed_ * Vector3(movement_.x_, 0.0f, movement_.y_));
 }
-
-
