@@ -21,19 +21,8 @@
 #define COURSECAM_H
 
 #include <Urho3D/Urho3D.h>
-#include <Urho3D/Graphics/Zone.h>
-
 #include "mastercontrol.h"
-
-namespace Urho3D {
-class Drawable;
-class Node;
-class Scene;
-class Sprite;
-class Viewport;
-class RenderPath;
-class Camera;
-}
+#include "helper.h"
 
 using namespace Urho3D;
 

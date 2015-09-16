@@ -17,11 +17,15 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+    helper.cpp \
     mastercontrol.cpp \
     inputmaster.cpp \
-    bnbcam.cpp
+    bnbcam.cpp \
+    player.cpp
 
 HEADERS += \
+    helper.h \
     mastercontrol.h \
     inputmaster.h \
-    bnbcam.h
+    bnbcam.h \
+    player.h

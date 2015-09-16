@@ -17,40 +17,32 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef INPUTMASTER_H
-#define INPUTMASTER_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include <Urho3D/Urho3D.h>
 #include "mastercontrol.h"
 #include "helper.h"
 
-namespace Urho3D {
-class Drawable;
-class Node;
-class Scene;
-class Sprite;
-}
-
 using namespace Urho3D;
 
-enum class JoystickButton {SELECT, LEFTSTICK, RIGHTSTICK, START, DPAD_UP, DPAD_RIGHT, DPAD_DOWN, DPAD_LEFT, L2, R2, L1, R1, TRIANGLE, CIRCLE, CROSS, SQUARE};
-
-class InputMaster : public Object
+class Player : public Object
 {
-    OBJECT(InputMaster);
+    friend class MasterControl;
+    OBJECT(Player);
 public:
-    InputMaster(Context* context, MasterControl* masterControl);
+    Player(Context *context, MasterControl *masterControl, bool blip = true);
 private:
-    MasterControl* masterControl_;
-    Input* input_;
-    void HandleUpdate(StringHash eventType, VariantMap &eventData);
-    void HandleKeyDown(StringHash eventType, VariantMap &eventData);
-    void HandleKeyUp(StringHash eventType, VariantMap &eventData);
-    void HandleJoyButtonDown(StringHash eventType, VariantMap &eventData);
-    void HandleJoyButtonUp(StringHash eventType, VariantMap &eventData);
+    MasterControl * masterControl_;
+    bool blip_;
+    Node* rootNode_;
+    AnimatedModel* model_;
+    RigidBody* rigidBody_;
+    CollisionShape* collider_;
+    AnimationController* animCtrl_;
+    float blink_;
 
-    Vector<int> pressedKeys_;
-    Vector<JoystickButton> pressedJoyButtons_;
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
 };
 
-#endif // INPUTMASTER_H
+#endif // PLAYER_H

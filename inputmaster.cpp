@@ -25,19 +25,29 @@ InputMaster::InputMaster(Context* context, MasterControl* masterControl) : Objec
     input_{GetSubsystem<Input>()}
 {
     SubscribeToEvent(E_KEYDOWN, HANDLER(InputMaster, HandleKeyDown));
+    SubscribeToEvent(E_KEYUP, HANDLER(InputMaster, HandleKeyUp));
+    SubscribeToEvent(E_JOYSTICKBUTTONDOWN, HANDLER(InputMaster, HandleJoyButtonDown));
+    SubscribeToEvent(E_JOYSTICKBUTTONUP, HANDLER(InputMaster, HandleJoyButtonUp));
+
+    SubscribeToEvent(E_UPDATE, HANDLER(InputMaster, HandleUpdate));
+}
+
+void InputMaster::HandleUpdate(StringHash eventType, VariantMap &eventData)
+{
 }
 
 void InputMaster::HandleKeyDown(StringHash eventType, VariantMap &eventData)
 {
-    using namespace KeyDown;
-    int key = eventData[P_KEY].GetInt();
-    Graphics* graphics = GetSubsystem<Graphics>();
+    int key = eventData[KeyDown::P_KEY].GetInt();
+    if (!pressedKeys_.Contains(key)) pressedKeys_.Push(key);
+
     switch (key){
     case KEY_ESC:{
         masterControl_->Exit();
     } break;
     case KEY_9:{
         Image screenshot(context_);
+        Graphics* graphics = GetSubsystem<Graphics>();
         graphics->TakeScreenShot(screenshot);
         //Here we save in the Data folder with date and time appended
         String fileName = GetSubsystem<FileSystem>()->GetProgramDir() + "Screenshots/Screenshot_" +
@@ -47,4 +57,21 @@ void InputMaster::HandleKeyDown(StringHash eventType, VariantMap &eventData)
     } break;
     default: break;
     }
+}
+
+void InputMaster::HandleKeyUp(StringHash eventType, VariantMap &eventData)
+{
+    int key = eventData[KeyUp::P_KEY].GetInt();
+    if (pressedKeys_.Contains(key)) pressedKeys_.Remove(key);
+}
+
+void InputMaster::HandleJoyButtonDown(StringHash eventType, VariantMap &eventData)
+{
+    JoystickButton button = static_cast<JoystickButton>(eventData[JoystickButtonDown::P_BUTTON].GetInt());
+    if (!pressedJoyButtons_.Contains(button)) pressedJoyButtons_.Push(button);
+}
+void InputMaster::HandleJoyButtonUp(StringHash eventType, VariantMap &eventData)
+{
+    JoystickButton button = static_cast<JoystickButton>(eventData[JoystickButtonUp::P_BUTTON].GetInt());
+    if (pressedJoyButtons_.Contains(button)) pressedJoyButtons_.Remove(button);
 }

@@ -19,6 +19,7 @@
 
 #include "mastercontrol.h"
 #include "bnbcam.h"
+#include "player.h"
 #include "inputmaster.h"
 
 DEFINE_APPLICATION_MAIN(MasterControl);
@@ -63,7 +64,7 @@ void MasterControl::Stop()
 void MasterControl::SubscribeToEvents()
 {
     SubscribeToEvent(E_UPDATE, HANDLER(MasterControl, HandleUpdate));
-    SubscribeToEvent(E_SCENEUPDATE, HANDLER(MasterControl, HandleSceneUpdate));
+    SubscribeToEvent(E_SCENEUPDATE, HANDLER(MasterControl, HandleUpdate));
 }
 
 void MasterControl::CreateConsoleAndDebugHud()
@@ -95,7 +96,20 @@ void MasterControl::CreateScene()
     world_.scene_->CreateComponent<DebugRenderer>();
 
     PhysicsWorld* physicsWorld = world_.scene_->CreateComponent<PhysicsWorld>();
-//    physicsWorld->SetGravity(Vector3::ZERO);
+
+    //Add sky
+    Node* skyNode = world_.scene_->CreateChild("Sky");
+    Skybox* skybox = skyNode->CreateComponent<Skybox>();
+    skybox->SetModel(cache_->GetResource<Model>("Models/Box.mdl"));
+    skybox->SetMaterial(cache_->GetResource<Material>("Materials/Skybox.xml"));
+
+    //Add ground
+    Node* groundNode = world_.scene_->CreateChild("Ground");
+    groundNode->SetScale(2.0f);
+    StaticModel* groundModel = groundNode->CreateComponent<StaticModel>();
+    groundModel->SetModel(cache_->GetResource<Model>("Resources/Models/Ground.mdl"));
+    groundModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
+    groundModel->SetCastShadows(true);
 
     //Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = world_.scene_->CreateChild("DirectionalLight");
@@ -106,11 +120,11 @@ void MasterControl::CreateScene()
     light->SetBrightness(0.9f);
     light->SetColor(Color(0.8f, 0.95f, 0.9f));
     light->SetCastShadows(true);
-    light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
+    light->SetShadowBias(BiasParameters(0.000125f, 0.5f));
     light->SetShadowCascade(CascadeParameters(7.0f, 23.0f, 42.0f, 500.0f, 0.8f));
 
-    //Create some Kekelplithfs
-    for (int k = 0; k < 5; k++){
+    //Create some Fish
+    for (int k = 0; k < 0; k++){
         Node* objectNode = world_.scene_->CreateChild("Fish");
         objectNode->SetPosition((-5.0f + 3.0f*k) * Vector3::RIGHT + (k%2) * 5.0f * Vector3::FORWARD);
         objectNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
@@ -132,17 +146,11 @@ void MasterControl::CreateScene()
         animCtrl->SetSpeed("Resources/Models/Walk.ani", Random(1.0f,2.0f));
     }
 
-    Node* skyNode = world_.scene_->CreateChild("Sky");
-//    skyNode_->SetScale(500.0f); // The scale actually does not matter
-    Skybox* skybox = skyNode->CreateComponent<Skybox>();
-    skybox->SetModel(cache_->GetResource<Model>("Models/Box.mdl"));
-    skybox->SetMaterial(cache_->GetResource<Material>("Materials/Skybox.xml"));
-
-    Node* groundNode = world_.scene_->CreateChild("Ground");
-    groundNode->SetScale(2.0f);
-    StaticModel* waterModel = groundNode->CreateComponent<StaticModel>();
-    waterModel->SetModel(cache_->GetResource<Model>("Resources/Models/Ground.mdl"));
-    waterModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
+    //Create a player
+    Player* blip = new Player(context_, this, true);
+    blip->rootNode_->SetPosition(Vector3::LEFT*5.0f);
+    Player* blup = new Player(context_, this, false);
+    blup->rootNode_->SetPosition(Vector3::RIGHT*5.0f);
 
     //Create camera
     world_.camera = new BnBCam(context_, this);
@@ -150,16 +158,7 @@ void MasterControl::CreateScene()
 
 void MasterControl::HandleUpdate(StringHash eventType, VariantMap &eventData)
 {
-}
-
-void MasterControl::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
-{
-    using namespace SceneUpdate;
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
-}
-
-void MasterControl::HandlePostRenderUpdate(StringHash eventType, VariantMap &eventData)
-{
+    float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 }
 
 void MasterControl::Exit()
