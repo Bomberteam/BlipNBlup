@@ -108,12 +108,14 @@ void InputMaster::HandleActions(const InputActions& actions)
         player1->Run(actions.player1_.Contains(PlayerInputAction::RUN));
         player1->SetMovement(player1Movement);
         if (actions.player1_.Contains(PlayerInputAction::JUMP)) player1->Jump();
+        else player1->JumpRelease();
     }
     if (masterControl_->PlayerIsAlive(BLUP) && masterControl_->PlayerIsHuman(BLUP)){
         Player* player2 = masterControl_->GetPlayer(BLUP);
         player2->Run(actions.player2_.Contains(PlayerInputAction::RUN));
         player2->SetMovement(player2Movement);
         if (actions.player2_.Contains(PlayerInputAction::JUMP)) player2->Jump();
+        else player2->JumpRelease();
     }
 }
 

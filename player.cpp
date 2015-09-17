@@ -27,13 +27,14 @@ Player::Player(Context *context, MasterControl *masterControl, bool blip) : Obje
     running_{false},
     onGround_{false},
     doubleJumped_{false},
+    jumpReleased_{true},
     sinceJumped_{0.0f},
     blink_{0.0f},
-    maxWalkSpeed_{10.0f},
+    maxWalkSpeed_{7.0f},
     runThrust_{2048.0f},
     movement_{Vector2::ZERO},
     jumpInterval_{0.23f},
-    jumpForce_{10.0f}
+    jumpForce_{23.0f}
 {
     rootNode_ = masterControl->world_.scene_->CreateChild("Player");
     if (blip_) rootNode_->SetName("Blip");
@@ -53,9 +54,9 @@ Player::Player(Context *context, MasterControl *masterControl, bool blip) : Obje
     rigidBody_->SetMass(1.0f);
     rigidBody_->SetAngularFactor(Vector3::UP);
     rigidBody_->SetAngularDamping(0.9f);
-    rigidBody_->SetFriction(0.9f);
+    rigidBody_->SetFriction(0.6f);
     collider_ = rootNode_->CreateComponent<CollisionShape>();
-    collider_->SetCapsule(3.0f, 3.0f, Vector3::UP*1.5f);
+    collider_->SetSphere(2.2f, Vector3::UP*1.1f);
 
     SubscribeToEvent(E_UPDATE, HANDLER(Player, HandleUpdate));
     SubscribeToEvent(rootNode_, E_NODECOLLISIONSTART, HANDLER(Player, HandleNodeCollisionStart));
@@ -116,21 +117,23 @@ void Player::Move(float timeStep)
         aimRotation.FromLookRotation(lookDirection);
         rootNode_->SetRotation(rotation.Slerp(aimRotation, Clamp((1.0f + (planarVelocity+movement_).Length()) * timeStep, 0.0f, 1.0f)));
     }
-    animCtrl_->SetSpeed("Resources/Models/Walk.ani", planarVelocity.Length()*0.16f*onGroundFloat);
+    animCtrl_->SetSpeed("Resources/Models/Walk.ani", planarVelocity.Length()*0.25f*onGroundFloat);
 }
 
 void Player::Jump()
 {
-    if (sinceJumped_ > jumpInterval_) {
+    if (sinceJumped_ > jumpInterval_ && jumpReleased_) {
         if (onGround_) {
             rigidBody_->ApplyImpulse(Vector3::UP*jumpForce_);
             onGround_ = false;
             sinceJumped_ = 0.0f;
-        } else if (!doubleJumped_) {
+            jumpReleased_ = false;
+        } /*else if (!doubleJumped_ && rigidBody_->GetLinearVelocity().y_ > 0.0f) {
             rigidBody_->ApplyImpulse(Vector3::UP*0.75f*jumpForce_);
             doubleJumped_ = true;
             sinceJumped_ = 0.0f;
-        }
+            jumpReleased_ = false;
+        }*/
     }
 }
 void Player::Blink()

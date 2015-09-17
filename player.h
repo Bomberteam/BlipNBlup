@@ -38,6 +38,7 @@ public:
     void SetMovement(const Vector2 movement);
     void Move(float timeStep);
     void Jump();
+    void JumpRelease() { if (onGround_) jumpReleased_ = true; }
     void Run(const bool run) { running_ = run; }
 private:
     MasterControl * masterControl_;
@@ -53,6 +54,7 @@ private:
     bool running_;
     bool onGround_;
     bool doubleJumped_;
+    bool jumpReleased_;
     float sinceJumped_;
     float blink_;
 

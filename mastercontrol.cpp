@@ -99,7 +99,7 @@ void MasterControl::CreateScene()
     world_.scene_->CreateComponent<DebugRenderer>();
 
     PhysicsWorld* physicsWorld = world_.scene_->CreateComponent<PhysicsWorld>();
-    physicsWorld->SetGravity(Vector3::DOWN*23.0f);
+    physicsWorld->SetGravity(Vector3::DOWN*42.0f);
 
     //Add sky
     Node* skyNode = world_.scene_->CreateChild("Sky");
@@ -115,7 +115,7 @@ void MasterControl::CreateScene()
     groundModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
     groundModel->SetCastShadows(true);
     RigidBody* groundBody = groundNode->CreateComponent<RigidBody>();
-    groundBody->SetFriction(0.9f);
+    groundBody->SetFriction(0.8f);
     CollisionShape* groundCollider = groundNode->CreateComponent<CollisionShape>();
     groundCollider->SetBox(Vector3(23.0f, 2.0f, 23.0f), Vector3::DOWN);
 
@@ -159,7 +159,7 @@ void MasterControl::CreateScene()
     blip_->rootNode_->SetPosition(Vector3::LEFT*7.0f);
     blup_ = new Player(context_, this, false);
     blup_->rootNode_->SetPosition(Vector3::RIGHT*3.0f);
-    blup_->human_ = false;
+//    blup_->human_ = false;
 
     //Create camera
     world_.camera = new BnBCam(context_, this);
