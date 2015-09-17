@@ -34,6 +34,14 @@ class Sprite;
 using namespace Urho3D;
 
 enum class JoystickButton {SELECT, LEFTSTICK, RIGHTSTICK, START, DPAD_UP, DPAD_RIGHT, DPAD_DOWN, DPAD_LEFT, L2, R2, L1, R1, TRIANGLE, CIRCLE, CROSS, SQUARE};
+enum class MasterInputAction { UP, RIGHT, DOWN, LEFT, CONFIRM, CANCEL, PAUSE, MENU, SCREENSHOT };
+enum class PlayerInputAction { UP, RIGHT, DOWN, LEFT, RUN, JUMP, BUBBLE };
+
+struct InputActions {
+    Vector<MasterInputAction> master_;
+    Vector<PlayerInputAction> player1_;
+    Vector<PlayerInputAction> player2_;
+};
 
 class InputMaster : public Object
 {
@@ -43,14 +51,25 @@ public:
 private:
     MasterControl* masterControl_;
     Input* input_;
+
+    HashMap<int, MasterInputAction> keyBindingsMaster_;
+    HashMap<int, MasterInputAction> buttonBindingsMaster_;
+    HashMap<int, PlayerInputAction> keyBindingsPlayer1_;
+    HashMap<int, PlayerInputAction> buttonBindingsPlayer1_;
+    HashMap<int, PlayerInputAction> keyBindingsPlayer2_;
+    HashMap<int, PlayerInputAction> buttonBindingsPlayer2_;
+
+    Vector<int> pressedKeys_;
+    Vector<JoystickButton> pressedJoystickButtons_;
+
     void HandleUpdate(StringHash eventType, VariantMap &eventData);
     void HandleKeyDown(StringHash eventType, VariantMap &eventData);
     void HandleKeyUp(StringHash eventType, VariantMap &eventData);
     void HandleJoyButtonDown(StringHash eventType, VariantMap &eventData);
     void HandleJoyButtonUp(StringHash eventType, VariantMap &eventData);
 
-    Vector<int> pressedKeys_;
-    Vector<JoystickButton> pressedJoyButtons_;
+    void HandleActions(const InputActions &actions);
+    void HandlePlayerAction(PlayerInputAction action, CharacterID player = BLIP);
 };
 
 #endif // INPUTMASTER_H

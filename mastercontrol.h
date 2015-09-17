@@ -49,6 +49,8 @@ typedef struct HitInfo
     Drawable* drawable_;
 } HitInfo;
 
+enum CharacterID { BLIP = 1, BLUP };
+
 namespace {
 StringHash const N_VOID = StringHash("Void");
 StringHash const N_CURSOR = StringHash("Cursor");
@@ -64,12 +66,9 @@ public:
     SharedPtr<ResourceCache> cache_;
     SharedPtr<Graphics> graphics_;
 
-    Player* GetPlayer(int id = 1) {
-        assert(id == 1 || id == 2);
-        switch (id){
-        case 1: return blip_; break;
-        case 2: return blup_; break;
-        default: break;}}
+    Player* GetPlayer(int id = 1);
+    bool PlayerIsAlive(int id = 1);
+    bool PlayerIsHuman(int id = 1);
 
     virtual void Setup();
     virtual void Start();

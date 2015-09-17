@@ -32,21 +32,41 @@ class Player : public Object
     OBJECT(Player);
 public:
     Player(Context *context, MasterControl *masterControl, bool blip = true);
-    void SetMovement(Vector2 movement) { movement_ = movement.Normalized(); }
+
+    bool IsAlive() { return alive_; }
+    bool IsHuman() { return human_; }
+    void SetMovement(const Vector2 movement);
+    void Move(float timeStep);
+    void Jump();
+    void Run(const bool run) { running_ = run; }
 private:
     MasterControl * masterControl_;
-    bool blip_;
+
     Node* rootNode_;
     AnimatedModel* model_;
     RigidBody* rigidBody_;
     CollisionShape* collider_;
     AnimationController* animCtrl_;
+    bool blip_;
+    bool human_;
+    bool alive_;
+    bool running_;
+    bool onGround_;
+    bool doubleJumped_;
+    float sinceJumped_;
     float blink_;
 
-    float walkSpeed_;
+    float maxWalkSpeed_;
+    float runThrust_;
     Vector2 movement_;
 
+    float jumpForce_;
+    float jumpInterval_;
+
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleNodeCollisionStart(StringHash eventType, VariantMap &eventData);
+    void Blink();
+    void Think();
 };
 
 #endif // PLAYER_H

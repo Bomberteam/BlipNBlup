@@ -26,15 +26,14 @@ DEFINE_APPLICATION_MAIN(MasterControl);
 
 MasterControl::MasterControl(Context *context):
     Application(context),
-    paused_(false)
+    paused_{false}
 {
 }
 
-
 void MasterControl::Setup()
 {
-    engineParameters_["WindowTitle"] = "De naam van dit venster";
-    engineParameters_["LogName"] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs")+"DOJO.log";
+    engineParameters_["WindowTitle"] = "Blip 'n Blup: Skyward Adventures";
+    engineParameters_["LogName"] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs")+"blipnblup.log";
 }
 void MasterControl::Start()
 {
@@ -59,6 +58,10 @@ void MasterControl::Start()
 void MasterControl::Stop()
 {
     engine_->DumpResources(true);
+}
+void MasterControl::Exit()
+{
+    engine_->Exit();
 }
 
 void MasterControl::SubscribeToEvents()
@@ -96,6 +99,7 @@ void MasterControl::CreateScene()
     world_.scene_->CreateComponent<DebugRenderer>();
 
     PhysicsWorld* physicsWorld = world_.scene_->CreateComponent<PhysicsWorld>();
+    physicsWorld->SetGravity(Vector3::DOWN*23.0f);
 
     //Add sky
     Node* skyNode = world_.scene_->CreateChild("Sky");
@@ -105,14 +109,15 @@ void MasterControl::CreateScene()
 
     //Add ground
     Node* groundNode = world_.scene_->CreateChild("Ground");
-    groundNode->SetScale(2.0f);
+    groundNode->SetScale(5.0f);
     StaticModel* groundModel = groundNode->CreateComponent<StaticModel>();
     groundModel->SetModel(cache_->GetResource<Model>("Resources/Models/Ground.mdl"));
     groundModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
     groundModel->SetCastShadows(true);
-    groundNode->CreateComponent<RigidBody>();
+    RigidBody* groundBody = groundNode->CreateComponent<RigidBody>();
+    groundBody->SetFriction(0.9f);
     CollisionShape* groundCollider = groundNode->CreateComponent<CollisionShape>();
-    groundCollider->SetBox(Vector3(10.0f, 2.0f, 10.0f), Vector3::DOWN);
+    groundCollider->SetBox(Vector3(23.0f, 2.0f, 23.0f), Vector3::DOWN);
 
     //Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = world_.scene_->CreateChild("DirectionalLight");
@@ -150,10 +155,11 @@ void MasterControl::CreateScene()
     }
 
     //Create a player
-    Player* blip_ = new Player(context_, this, true);
-    blip_->rootNode_->SetPosition(Vector3::LEFT*5.0f);
-    Player* blup_ = new Player(context_, this, false);
-    blup_->rootNode_->SetPosition(Vector3::RIGHT*5.0f);
+    blip_ = new Player(context_, this, true);
+    blip_->rootNode_->SetPosition(Vector3::LEFT*7.0f);
+    blup_ = new Player(context_, this, false);
+    blup_->rootNode_->SetPosition(Vector3::RIGHT*3.0f);
+    blup_->human_ = false;
 
     //Create camera
     world_.camera = new BnBCam(context_, this);
@@ -164,9 +170,24 @@ void MasterControl::HandleUpdate(StringHash eventType, VariantMap &eventData)
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 }
 
-void MasterControl::Exit()
-{
-    engine_->Exit();
+Player *MasterControl::GetPlayer(int id) {
+    assert(id == 1 || id == 2);
+    switch (id){
+    case 1: return blip_; break;
+    case 2: return blup_; break;
+    default: return nullptr; break;}
+}
+bool MasterControl::PlayerIsAlive(int id) {
+    assert(id == 1 || id == 2);
+    Player* player = GetPlayer(id);
+    if (player != nullptr) return player->IsAlive();
+    else return false;
+}
+bool MasterControl::PlayerIsHuman(int id) {
+    assert(id == 1 || id == 2);
+    Player* player = GetPlayer(id);
+    if (player != nullptr) return player->IsHuman();
+    else return false;
 }
 
 

@@ -34,6 +34,7 @@
 #include <Urho3D/Graphics/AnimationController.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Graphics/RenderPath.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/Light.h>
 #include <Urho3D/Graphics/Material.h>
@@ -51,6 +52,7 @@
 #include <Urho3D/IO/Log.h>
 #include <Urho3D/Math/MathDefs.h>
 #include <Urho3D/Math/Vector3.h>
+#include <Urho3D/Physics/PhysicsEvents.h>
 #include <Urho3D/Physics/CollisionShape.h>
 #include <Urho3D/Physics/PhysicsWorld.h>
 #include <Urho3D/Physics/RigidBody.h>

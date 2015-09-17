@@ -44,6 +44,7 @@ void BnBCam::SetupViewport()
     viewport_ = viewport;
 
     Renderer* renderer = GetSubsystem<Renderer>();
+
     viewport_->SetRenderPath(effectRenderPath_);
     renderer->SetViewport(0, viewport_);
 }
