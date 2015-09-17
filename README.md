@@ -1,4 +1,4 @@
-#:four_leaf_clover: Blip 'n Blup's Skyward Adventures
+#:four_leaf_clover: Blip 'n Blup: Skyward Adventures
 =========
 
 Two fish, a pact with Sa'Tong and a quest for food, enlightenment and trust.
