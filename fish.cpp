@@ -17,9 +17,9 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "player.h"
+#include "fish.h"
 
-Player::Player(Context *context, MasterControl *masterControl, bool blip) : Object(context),
+Fish::Fish(Context *context, MasterControl *masterControl, bool blip) : Object(context),
     masterControl_{masterControl},
     blip_{blip},
     human_{true},
@@ -58,17 +58,17 @@ Player::Player(Context *context, MasterControl *masterControl, bool blip) : Obje
     collider_ = rootNode_->CreateComponent<CollisionShape>();
     collider_->SetSphere(2.2f, Vector3::UP*1.1f);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(Player, HandleUpdate));
-    SubscribeToEvent(rootNode_, E_NODECOLLISIONSTART, HANDLER(Player, HandleNodeCollisionStart));
+    SubscribeToEvent(E_UPDATE, HANDLER(Fish, HandleUpdate));
+    SubscribeToEvent(rootNode_, E_NODECOLLISIONSTART, HANDLER(Fish, HandleNodeCollisionStart));
 }
 
-void Player::SetMovement(const Vector2 movement) {
+void Fish::SetMovement(const Vector2 movement) {
     if (movement.Length() > 1.0f)
         movement_ = movement.Normalized();
     else movement_ = movement;
 }
 
-void Player::HandleUpdate(StringHash eventType, VariantMap &eventData)
+void Fish::HandleUpdate(StringHash eventType, VariantMap &eventData)
 {
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
     sinceJumped_ += timeStep;
@@ -85,7 +85,7 @@ void Player::HandleUpdate(StringHash eventType, VariantMap &eventData)
     }
 }
 
-void Player::HandleNodeCollisionStart(StringHash eventType, VariantMap &eventData)
+void Fish::HandleNodeCollisionStart(StringHash eventType, VariantMap &eventData)
 {
     VectorBuffer contacts = eventData[NodeCollisionStart::P_CONTACTS].GetBuffer();
     while (!contacts.IsEof()) {
@@ -98,7 +98,7 @@ void Player::HandleNodeCollisionStart(StringHash eventType, VariantMap &eventDat
     }
 }
 
-void Player::Move(float timeStep)
+void Fish::Move(float timeStep)
 {
     Vector3 velocity = rigidBody_->GetLinearVelocity();
     Vector3 planarVelocity = Vector3(velocity.x_, 0.0f, velocity.z_);
@@ -120,11 +120,14 @@ void Player::Move(float timeStep)
     animCtrl_->SetSpeed("Resources/Models/Walk.ani", planarVelocity.Length()*0.25f*onGroundFloat);
 }
 
-void Player::Jump()
+void Fish::Jump()
 {
     if (sinceJumped_ > jumpInterval_ && jumpReleased_) {
         if (onGround_) {
-            rigidBody_->ApplyImpulse(Vector3::UP*jumpForce_);
+            rigidBody_->ApplyImpulse(Vector3(
+                                         0.23f*movement_.x_,
+                                         Clamp(1.0f - movement_.Length(), 0.8f, 1.0f),
+                                         0.23f*movement_.y_) * jumpForce_);
             onGround_ = false;
             sinceJumped_ = 0.0f;
             jumpReleased_ = false;
@@ -136,7 +139,7 @@ void Player::Jump()
         }*/
     }
 }
-void Player::Blink()
+void Fish::Blink()
 {
     if (blink_ < 0.0001f && !Random(23)) blink_ = 1.0f;
     blink_ *= 0.9f;
@@ -147,7 +150,7 @@ void Player::Blink()
     else model_->SetMorphWeight(0, blink_);
 }
 
-void Player::Think()
+void Fish::Think()
 {
     movement_.x_ = sin(masterControl_->world_.scene_->GetElapsedTime()*1.23f);
     movement_.y_ = cos(masterControl_->world_.scene_->GetElapsedTime()*1.23f);

@@ -104,14 +104,14 @@ void InputMaster::HandleActions(const InputActions& actions)
                actions.player2_.Contains(PlayerInputAction::DOWN)));
 
     if (masterControl_->PlayerIsAlive(BLIP) && masterControl_->PlayerIsHuman(BLIP)){
-        Player* player1 = masterControl_->GetPlayer(BLIP);
+        Fish* player1 = masterControl_->GetPlayer(BLIP);
         player1->Run(actions.player1_.Contains(PlayerInputAction::RUN));
         player1->SetMovement(player1Movement);
         if (actions.player1_.Contains(PlayerInputAction::JUMP)) player1->Jump();
         else player1->JumpRelease();
     }
     if (masterControl_->PlayerIsAlive(BLUP) && masterControl_->PlayerIsHuman(BLUP)){
-        Player* player2 = masterControl_->GetPlayer(BLUP);
+        Fish* player2 = masterControl_->GetPlayer(BLUP);
         player2->Run(actions.player2_.Contains(PlayerInputAction::RUN));
         player2->SetMovement(player2Movement);
         if (actions.player2_.Contains(PlayerInputAction::JUMP)) player2->Jump();

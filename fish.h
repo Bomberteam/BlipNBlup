@@ -26,13 +26,14 @@
 
 using namespace Urho3D;
 
-class Player : public Object
+class Fish : public Object
 {
     friend class MasterControl;
-    OBJECT(Player);
+    OBJECT(Fish);
 public:
-    Player(Context *context, MasterControl *masterControl, bool blip = true);
+    Fish(Context *context, MasterControl *masterControl, bool blip = true);
 
+    Vector3 GetPosition() { return rootNode_->GetWorldPosition(); }
     bool IsAlive() { return alive_; }
     bool IsHuman() { return human_; }
     void SetMovement(const Vector2 movement);

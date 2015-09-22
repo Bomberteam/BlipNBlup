@@ -27,7 +27,7 @@ using namespace Urho3D;
 
 class InputMaster;
 class BnBCam;
-class Player;
+class Fish;
 
 typedef struct GameWorld
 {
@@ -66,7 +66,7 @@ public:
     SharedPtr<ResourceCache> cache_;
     SharedPtr<Graphics> graphics_;
 
-    Player* GetPlayer(int id = 1);
+    Fish* GetPlayer(int id = 1);
     bool PlayerIsAlive(int id = 1);
     bool PlayerIsHuman(int id = 1);
 
@@ -79,8 +79,8 @@ private:
     SharedPtr<Renderer> renderer_;
     SharedPtr<XMLFile> defaultStyle_;
 
-    Player* blip_;
-    Player* blup_;
+    Fish* blip_;
+    Fish* blup_;
 
     void CreateConsoleAndDebugHud();
     void CreateScene();

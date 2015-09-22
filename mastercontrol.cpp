@@ -155,11 +155,11 @@ void MasterControl::CreateScene()
     }
 
     //Create a player
-    blip_ = new Player(context_, this, true);
+    blip_ = new Fish(context_, this, true);
     blip_->rootNode_->SetPosition(Vector3::LEFT*7.0f);
-    blup_ = new Player(context_, this, false);
+    blup_ = new Fish(context_, this, false);
     blup_->rootNode_->SetPosition(Vector3::RIGHT*3.0f);
-//    blup_->human_ = false;
+    blup_->human_ = false;
 
     //Create camera
     world_.camera = new BnBCam(context_, this);
@@ -170,7 +170,7 @@ void MasterControl::HandleUpdate(StringHash eventType, VariantMap &eventData)
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 }
 
-Player *MasterControl::GetPlayer(int id) {
+Fish *MasterControl::GetPlayer(int id) {
     assert(id == 1 || id == 2);
     switch (id){
     case 1: return blip_; break;
@@ -179,13 +179,13 @@ Player *MasterControl::GetPlayer(int id) {
 }
 bool MasterControl::PlayerIsAlive(int id) {
     assert(id == 1 || id == 2);
-    Player* player = GetPlayer(id);
+    Fish* player = GetPlayer(id);
     if (player != nullptr) return player->IsAlive();
     else return false;
 }
 bool MasterControl::PlayerIsHuman(int id) {
     assert(id == 1 || id == 2);
-    Player* player = GetPlayer(id);
+    Fish* player = GetPlayer(id);
     if (player != nullptr) return player->IsHuman();
     else return false;
 }

@@ -21,11 +21,11 @@ SOURCES += \
     mastercontrol.cpp \
     inputmaster.cpp \
     bnbcam.cpp \
-    player.cpp
+    fish.cpp
 
 HEADERS += \
     helper.h \
     mastercontrol.h \
     inputmaster.h \
     bnbcam.h \
-    player.h
+    fish.h
