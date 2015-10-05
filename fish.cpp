@@ -19,9 +19,9 @@
 
 #include "fish.h"
 
-Fish::Fish(Context *context, MasterControl *masterControl, bool blip) : Object(context),
+Fish::Fish(Context *context, MasterControl *masterControl, CharacterID id) : Object(context),
     masterControl_{masterControl},
-    blip_{blip},
+    id_{id},
     human_{true},
     alive_{true},
     running_{false},
@@ -37,15 +37,21 @@ Fish::Fish(Context *context, MasterControl *masterControl, bool blip) : Object(c
     jumpForce_{23.0f}
 {
     rootNode_ = masterControl->world_.scene_->CreateChild("Player");
-    if (blip_) rootNode_->SetName("Blip");
-    else rootNode_->SetName("Blup");
-
     model_ = rootNode_->CreateComponent<AnimatedModel>();
-    if (blip_) model_->SetModel(masterControl->cache_->GetResource<Model>("Resources/Models/Blip.mdl"));
-    else model_->SetModel(masterControl->cache_->GetResource<Model>("Resources/Models/Blup.mdl"));
+    switch (id_){
+    case BLIP: {
+        rootNode_->SetName("Blip");
+        model_->SetModel(masterControl->cache_->GetResource<Model>("Resources/Models/Blip.mdl"));
+    } break;
+    case BLUP: {
+        rootNode_->SetName("Blup");
+        model_->SetModel(masterControl->cache_->GetResource<Model>("Resources/Models/Blup.mdl"));
+        model_->SetMorphWeight(1, 1.0f);
+    } break;
+    default: break;
+    }
     model_->SetMaterial(masterControl->cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
     model_->SetCastShadows(true);
-    model_->SetMorphWeight(1, !blip_);
 
     animCtrl_ = rootNode_->CreateComponent<AnimationController>();
     animCtrl_->PlayExclusive("Resources/Models/Walk.ani", 0, true);
@@ -74,14 +80,12 @@ void Fish::HandleUpdate(StringHash eventType, VariantMap &eventData)
     sinceJumped_ += timeStep;
 
     if (alive_){
+        //Think
+        if (!human_) Think();
         //Apply movement
         Move(timeStep);
         //Blink
         Blink();
-        //Think
-        if (!human_){
-            Think();
-        }
     }
 }
 
@@ -131,12 +135,7 @@ void Fish::Jump()
             onGround_ = false;
             sinceJumped_ = 0.0f;
             jumpReleased_ = false;
-        } /*else if (!doubleJumped_ && rigidBody_->GetLinearVelocity().y_ > 0.0f) {
-            rigidBody_->ApplyImpulse(Vector3::UP*0.75f*jumpForce_);
-            doubleJumped_ = true;
-            sinceJumped_ = 0.0f;
-            jumpReleased_ = false;
-        }*/
+        }
     }
 }
 void Fish::Blink()

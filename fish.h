@@ -22,7 +22,7 @@
 
 #include <Urho3D/Urho3D.h>
 #include "mastercontrol.h"
-#include "helper.h"
+#include "luckey.h"
 
 using namespace Urho3D;
 
@@ -31,16 +31,15 @@ class Fish : public Object
     friend class MasterControl;
     OBJECT(Fish);
 public:
-    Fish(Context *context, MasterControl *masterControl, bool blip = true);
+    Fish(Context *context, MasterControl *masterControl, CharacterID id = BLIP);
 
     Vector3 GetPosition() { return rootNode_->GetWorldPosition(); }
     bool IsAlive() { return alive_; }
     bool IsHuman() { return human_; }
     void SetMovement(const Vector2 movement);
-    void Move(float timeStep);
     void Jump();
     void JumpRelease() { if (onGround_) jumpReleased_ = true; }
-    void Run(const bool run) { running_ = run; }
+    void SetRunning(const bool running) { running_ = running; }
 private:
     MasterControl * masterControl_;
 
@@ -49,7 +48,7 @@ private:
     RigidBody* rigidBody_;
     CollisionShape* collider_;
     AnimationController* animCtrl_;
-    bool blip_;
+    CharacterID id_;
     bool human_;
     bool alive_;
     bool running_;
@@ -68,6 +67,7 @@ private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleNodeCollisionStart(StringHash eventType, VariantMap &eventData);
+    void Move(float timeStep);
     void Blink();
     void Think();
 };

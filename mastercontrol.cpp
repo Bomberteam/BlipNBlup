@@ -19,7 +19,7 @@
 
 #include "mastercontrol.h"
 #include "bnbcam.h"
-#include "player.h"
+#include "fish.h"
 #include "inputmaster.h"
 
 DEFINE_APPLICATION_MAIN(MasterControl);
@@ -155,9 +155,9 @@ void MasterControl::CreateScene()
     }
 
     //Create a player
-    blip_ = new Fish(context_, this, true);
+    blip_ = new Fish(context_, this, BLIP);
     blip_->rootNode_->SetPosition(Vector3::LEFT*7.0f);
-    blup_ = new Fish(context_, this, false);
+    blup_ = new Fish(context_, this, BLUP);
     blup_->rootNode_->SetPosition(Vector3::RIGHT*3.0f);
     blup_->human_ = false;
 

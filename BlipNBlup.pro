@@ -17,15 +17,15 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    helper.cpp \
+    luckey.cpp \
     mastercontrol.cpp \
     inputmaster.cpp \
     bnbcam.cpp \
-    fish.cpp
+    fish.cpp \
 
 HEADERS += \
-    helper.h \
+    luckey.h \
     mastercontrol.h \
     inputmaster.h \
     bnbcam.h \
-    fish.h
+    fish.h \

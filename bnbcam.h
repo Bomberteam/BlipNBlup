@@ -22,7 +22,7 @@
 
 #include <Urho3D/Urho3D.h>
 #include "mastercontrol.h"
-#include "helper.h"
+#include "luckey.h"
 
 using namespace Urho3D;
 
