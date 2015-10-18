@@ -66,7 +66,7 @@ private:
     float jumpInterval_;
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleNodeCollisionStart(StringHash eventType, VariantMap &eventData);
+    void HandleNodeCollision(StringHash eventType, VariantMap &eventData);
     void Move(float timeStep);
     void Blink();
     void Think();

@@ -31,7 +31,7 @@ Fish::Fish(Context *context, MasterControl *masterControl, CharacterID id) : Obj
     sinceJumped_{0.0f},
     blink_{0.0f},
     maxWalkSpeed_{7.0f},
-    runThrust_{2048.0f},
+    runThrust_{4096.0f},
     movement_{Vector2::ZERO},
     jumpInterval_{0.23f},
     jumpForce_{23.0f}
@@ -64,8 +64,8 @@ Fish::Fish(Context *context, MasterControl *masterControl, CharacterID id) : Obj
     collider_ = rootNode_->CreateComponent<CollisionShape>();
     collider_->SetSphere(2.2f, Vector3::UP*1.1f);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(Fish, HandleUpdate));
-    SubscribeToEvent(rootNode_, E_NODECOLLISIONSTART, HANDLER(Fish, HandleNodeCollisionStart));
+    SubscribeToEvent(rootNode_, E_NODECOLLISION, HANDLER(Fish, HandleNodeCollision));
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(Fish, HandleUpdate));
 }
 
 void Fish::SetMovement(const Vector2 movement) {
@@ -89,13 +89,13 @@ void Fish::HandleUpdate(StringHash eventType, VariantMap &eventData)
     }
 }
 
-void Fish::HandleNodeCollisionStart(StringHash eventType, VariantMap &eventData)
+void Fish::HandleNodeCollision(StringHash eventType, VariantMap &eventData)
 {
     VectorBuffer contacts = eventData[NodeCollisionStart::P_CONTACTS].GetBuffer();
     while (!contacts.IsEof()) {
         Vector3 contactPosition = contacts.ReadVector3();
         Vector3 contactNormal = contacts.ReadVector3();
-        if (contactNormal.Angle(Vector3::UP) < 23.0f) {
+        if (contactNormal.Angle(Vector3::UP) < 42.0f) {
             onGround_ = true;
             doubleJumped_ = false;
         }

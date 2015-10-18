@@ -59,13 +59,14 @@ void BnBCam::HandleSceneUpdate(StringHash eventType, VariantMap &eventData)
     float timeStep = eventData[SceneUpdate::P_TIMESTEP].GetFloat();
     Vector3 playerPosition = masterControl_->GetPlayer()->GetPosition();
     Vector3 playerDeltaPos = playerPosition - rootNode_->GetWorldPosition();
+    Vector3 playerDeltaPos2D = playerDeltaPos * (Vector3::ONE-Vector3::UP);
     Vector3 direction = rootNode_->GetDirection();
     float targetAngle = direction.Angle(playerDeltaPos);
     Quaternion newRot{};
     newRot.FromLookRotation(playerDeltaPos);
     rootNode_->SetRotation(rootNode_->GetRotation().Slerp(newRot, Clamp(timeStep * targetAngle * 0.23f, 0.0f, 1.0f)));
 
-    rootNode_->Translate((timeStep * Clamp(playerDeltaPos.Length()-23.0f, -5.0f, 5.0f)) * Vector3::FORWARD * 5.0f, TS_LOCAL);
+    rootNode_->Translate((timeStep * Clamp(playerDeltaPos2D.Length()-23.0f, -23.0f, 23.0f)) * Vector3::FORWARD * 5.0f, TS_LOCAL);
     float targetAltitude = playerPosition.y_ + 12.0f;
     float altitudeDelta = targetAltitude - rootNode_->GetPosition().y_;
     rootNode_->Translate((timeStep * altitudeDelta) * Vector3::UP, TS_WORLD);

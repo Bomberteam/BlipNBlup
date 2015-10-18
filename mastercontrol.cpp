@@ -110,14 +110,16 @@ void MasterControl::CreateScene()
     //Add ground
     Node* groundNode = world_.scene_->CreateChild("Ground");
     groundNode->SetScale(5.0f);
+    groundNode->Translate(Vector3::DOWN*5.0f);
     StaticModel* groundModel = groundNode->CreateComponent<StaticModel>();
-    groundModel->SetModel(cache_->GetResource<Model>("Resources/Models/Ground.mdl"));
+    Model* phyisicalModel = cache_->GetResource<Model>("Resources/Models/Level1_physical.mdl");
+    groundModel->SetModel(phyisicalModel);
     groundModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
     groundModel->SetCastShadows(true);
     RigidBody* groundBody = groundNode->CreateComponent<RigidBody>();
     groundBody->SetFriction(0.8f);
     CollisionShape* groundCollider = groundNode->CreateComponent<CollisionShape>();
-    groundCollider->SetBox(Vector3(23.0f, 2.0f, 23.0f), Vector3::DOWN);
+    groundCollider->SetTriangleMesh(phyisicalModel);//SetBox(Vector3(23.0f, 2.0f, 23.0f), Vector3::DOWN);
 
     //Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode = world_.scene_->CreateChild("DirectionalLight");
