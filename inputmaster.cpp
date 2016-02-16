@@ -21,17 +21,19 @@
 #include "bnbcam.h"
 #include "fish.h"
 
+using namespace LucKey;
+
 InputMaster::InputMaster(Context* context, MasterControl* masterControl) : Object(context),
     masterControl_{masterControl},
     input_{GetSubsystem<Input>()}
 {
-    keyBindingsMaster_[KEY_UP]     = buttonBindingsMaster_[static_cast<int>(JoystickButton::DPAD_UP)]    = MasterInputAction::UP;
-    keyBindingsMaster_[KEY_RIGHT]  = buttonBindingsMaster_[static_cast<int>(JoystickButton::DPAD_RIGHT)] = MasterInputAction::RIGHT;
-    keyBindingsMaster_[KEY_DOWN]   = buttonBindingsMaster_[static_cast<int>(JoystickButton::DPAD_DOWN)]  = MasterInputAction::DOWN;
-    keyBindingsMaster_[KEY_LEFT]   = buttonBindingsMaster_[static_cast<int>(JoystickButton::DPAD_LEFT)]  = MasterInputAction::LEFT;
-    keyBindingsMaster_[KEY_RETURN] = buttonBindingsMaster_[static_cast<int>(JoystickButton::CROSS)]      = MasterInputAction::CONFIRM;
-    keyBindingsMaster_[KEY_ESC]   = buttonBindingsMaster_[static_cast<int>(JoystickButton::CIRCLE)]     = MasterInputAction::CANCEL;
-    keyBindingsMaster_[KEY_PAUSE]  = buttonBindingsMaster_[static_cast<int>(JoystickButton::START)]      = MasterInputAction::PAUSE;
+    keyBindingsMaster_[KEY_UP]     = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_UP)]    = MasterInputAction::UP;
+    keyBindingsMaster_[KEY_RIGHT]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_RIGHT)] = MasterInputAction::RIGHT;
+    keyBindingsMaster_[KEY_DOWN]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_DOWN)]  = MasterInputAction::DOWN;
+    keyBindingsMaster_[KEY_LEFT]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_LEFT)]  = MasterInputAction::LEFT;
+    keyBindingsMaster_[KEY_RETURN] = buttonBindingsMaster_[static_cast<int>(SixaxisButton::CROSS)]      = MasterInputAction::CONFIRM;
+    keyBindingsMaster_[KEY_ESC]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::CIRCLE)]     = MasterInputAction::CANCEL;
+    keyBindingsMaster_[KEY_PAUSE]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::START)]      = MasterInputAction::PAUSE;
     keyBindingsMaster_[KEY_ESC]    = MasterInputAction::MENU;
 
     keyBindingsPlayer1_[KEY_W] = keyBindingsPlayer1_[KEY_UP]    = PlayerInputAction::UP;
@@ -50,11 +52,11 @@ InputMaster::InputMaster(Context* context, MasterControl* masterControl) : Objec
     keyBindingsPlayer2_[KEY_RSHIFT]  = PlayerInputAction::JUMP;
     keyBindingsPlayer2_[KEY_RCTRL]   = PlayerInputAction::BUBBLE;
 
-    SubscribeToEvent(E_KEYDOWN, HANDLER(InputMaster, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, HANDLER(InputMaster, HandleKeyUp));
-    SubscribeToEvent(E_JOYSTICKBUTTONDOWN, HANDLER(InputMaster, HandleJoyButtonDown));
-    SubscribeToEvent(E_JOYSTICKBUTTONUP, HANDLER(InputMaster, HandleJoyButtonUp));
-    SubscribeToEvent(E_UPDATE, HANDLER(InputMaster, HandleUpdate));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(InputMaster, HandleKeyDown));
+    SubscribeToEvent(E_KEYUP, URHO3D_HANDLER(InputMaster, HandleKeyUp));
+    SubscribeToEvent(E_JOYSTICKBUTTONDOWN, URHO3D_HANDLER(InputMaster, HandleJoyButtonDown));
+    SubscribeToEvent(E_JOYSTICKBUTTONUP, URHO3D_HANDLER(InputMaster, HandleJoyButtonUp));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(InputMaster, HandleUpdate));
 }
 
 void InputMaster::HandleUpdate(StringHash eventType, VariantMap &eventData)
@@ -151,12 +153,12 @@ void InputMaster::HandleKeyUp(StringHash eventType, VariantMap &eventData)
 
 void InputMaster::HandleJoyButtonDown(StringHash eventType, VariantMap &eventData)
 {
-    JoystickButton button = static_cast<JoystickButton>(eventData[JoystickButtonDown::P_BUTTON].GetInt());
+    SixaxisButton button = static_cast<SixaxisButton>(eventData[JoystickButtonDown::P_BUTTON].GetInt());
     if (!pressedJoystickButtons_.Contains(button)) pressedJoystickButtons_.Push(button);
 }
 void InputMaster::HandleJoyButtonUp(StringHash eventType, VariantMap &eventData)
 {
-    JoystickButton button = static_cast<JoystickButton>(eventData[JoystickButtonUp::P_BUTTON].GetInt());
+    SixaxisButton button = static_cast<SixaxisButton>(eventData[JoystickButtonUp::P_BUTTON].GetInt());
     if (pressedJoystickButtons_.Contains(button)) pressedJoystickButtons_.Remove(button);
 }
 

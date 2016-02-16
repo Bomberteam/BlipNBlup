@@ -22,7 +22,7 @@
 #include "fish.h"
 #include "inputmaster.h"
 
-DEFINE_APPLICATION_MAIN(MasterControl);
+URHO3D_DEFINE_APPLICATION_MAIN(MasterControl);
 
 MasterControl::MasterControl(Context *context):
     Application(context),
@@ -66,8 +66,8 @@ void MasterControl::Exit()
 
 void MasterControl::SubscribeToEvents()
 {
-    SubscribeToEvent(E_UPDATE, HANDLER(MasterControl, HandleUpdate));
-    SubscribeToEvent(E_SCENEUPDATE, HANDLER(MasterControl, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MasterControl, HandleUpdate));
+    SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(MasterControl, HandleUpdate));
 }
 
 void MasterControl::CreateConsoleAndDebugHud()

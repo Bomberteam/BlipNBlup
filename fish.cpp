@@ -64,8 +64,8 @@ Fish::Fish(Context *context, MasterControl *masterControl, CharacterID id) : Obj
     collider_ = rootNode_->CreateComponent<CollisionShape>();
     collider_->SetSphere(2.2f, Vector3::UP*1.1f);
 
-    SubscribeToEvent(rootNode_, E_NODECOLLISION, HANDLER(Fish, HandleNodeCollision));
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(Fish, HandleUpdate));
+    SubscribeToEvent(rootNode_, E_NODECOLLISION, URHO3D_HANDLER(Fish, HandleNodeCollision));
+    SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(Fish, HandleUpdate));
 }
 
 void Fish::SetMovement(const Vector2 movement) {

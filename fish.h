@@ -29,7 +29,7 @@ using namespace Urho3D;
 class Fish : public Object
 {
     friend class MasterControl;
-    OBJECT(Fish);
+    URHO3D_OBJECT(Fish, Object);
 public:
     Fish(Context *context, MasterControl *masterControl, CharacterID id = BLIP);
 

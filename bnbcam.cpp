@@ -37,7 +37,7 @@ BnBCam::BnBCam(Context *context, MasterControl *masterControl):
 
     SetupViewport();
 
-    SubscribeToEvent(E_SCENEUPDATE, HANDLER(BnBCam, HandleSceneUpdate));
+    SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(BnBCam, HandleSceneUpdate));
 }
 
 void BnBCam::SetupViewport()

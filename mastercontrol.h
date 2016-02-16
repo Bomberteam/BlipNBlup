@@ -58,7 +58,7 @@ StringHash const N_CURSOR = StringHash("Cursor");
 
 class MasterControl : public Application
 {
-    OBJECT(MasterControl);
+    URHO3D_OBJECT(MasterControl, Application);
     friend class InputMaster;
 public:
     MasterControl(Context* context);

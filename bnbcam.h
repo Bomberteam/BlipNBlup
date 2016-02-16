@@ -28,7 +28,7 @@ using namespace Urho3D;
 
 class BnBCam : public Object
 {
-    OBJECT(BnBCam);
+    URHO3D_OBJECT(BnBCam, Object);
     friend class MasterControl;
     friend class InputMaster;
 public:
