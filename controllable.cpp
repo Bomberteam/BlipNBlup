@@ -13,7 +13,7 @@ void Controllable::SetActions(std::bitset<4> actions)
     if (actions == actions_)
         return;
     else
-        for (int i{0}; i < actions.size(); ++i){
+        for (int i{0}; i < static_cast<int>(actions.size()); ++i){
             if (actions[i]!=actions_[i]){
                 if (actions[i])
                     HandleAction(i);
@@ -21,10 +21,8 @@ void Controllable::SetActions(std::bitset<4> actions)
             }
         }
 }
-
 void Controllable::HandleAction(int actionId)
-{
-
+{ (void)actionId;
 }
 
 

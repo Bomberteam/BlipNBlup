@@ -56,6 +56,7 @@
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
+#include <Urho3D/IO/MemoryBuffer.h>
 #include <Urho3D/Math/MathDefs.h>
 #include <Urho3D/Math/Plane.h>
 #include <Urho3D/Math/Sphere.h>
@@ -107,6 +108,7 @@ class Camera;
 }
 
 using namespace Urho3D;
+
 namespace LucKey {
 
 enum SixaxisButton {  SB_SELECT, SB_LEFTSTICK, SB_RIGHTSTICK, SB_START,

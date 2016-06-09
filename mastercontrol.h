@@ -32,8 +32,6 @@ class Fish;
 
 typedef struct GameWorld {
 
-    SharedPtr<BnBCam> camera_;
-    SharedPtr<Scene> scene_;
     SharedPtr<Node> voidNode;
     struct {
         SharedPtr<Node> sceneCursor;
@@ -79,12 +77,21 @@ public:
     virtual void Stop();
     void Exit();
 
-    Fish* GetBlip() { return blip_.Get(); }
 
+    Scene* GetScene() { return scene_; }
+
+    Fish* GetBlip() { return blip_.Get(); }
+    Fish* GetBlup() { return blup_.Get(); }
+
+    float Sine(const float freq, const float min, const float max, const float shift = 0.0f);
+    float Cosine(const float freq, const float min, const float max, const float shift = 0.0f);
 private:
     SharedPtr<UI> ui_;
     SharedPtr<Renderer> renderer_;
     SharedPtr<XMLFile> defaultStyle_;
+
+    SharedPtr<BnBCam> camera_;
+    SharedPtr<Scene> scene_;
 
     SharedPtr<Fish> blip_;
     SharedPtr<Fish> blup_;
@@ -101,6 +108,8 @@ private:
     bool CursorRayCast(float maxDistance, PODVector<RayQueryResult> &hitResults);
 
     bool paused_;
+    bool drawDebug_{false};
+    void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // MASTERCONTROL_H

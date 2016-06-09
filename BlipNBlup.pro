@@ -22,7 +22,9 @@ SOURCES += \
     inputmaster.cpp \
     bnbcam.cpp \
     fish.cpp \
-    controllable.cpp
+    controllable.cpp \
+    walker.cpp \
+    castmaster.cpp
 
 HEADERS += \
     luckey.h \
@@ -30,4 +32,6 @@ HEADERS += \
     inputmaster.h \
     bnbcam.h \
     fish.h \
-    controllable.h
+    controllable.h \
+    walker.h \
+    castmaster.h
