@@ -21,38 +21,37 @@
 #define COURSECAM_H
 
 #include <Urho3D/Urho3D.h>
-#include "mastercontrol.h"
+
+#include "controllable.h"
 #include "luckey.h"
 
 using namespace Urho3D;
 
-class BnBCam : public Object
+class BnBCam : public Controllable
 {
-    URHO3D_OBJECT(BnBCam, Object);
-    friend class MasterControl;
-    friend class InputMaster;
+    URHO3D_OBJECT(BnBCam, Controllable);
 public:
-    BnBCam(Context *context, MasterControl* masterControl);
+    BnBCam(Context *context);
+    static void RegisterObject(Context* context);
+    virtual void OnNodeSet(Node* node);
 
+    Quaternion GetRotation() const { return node_->GetRotation(); }
+    Camera* GetCamera() const { return camera_.Get(); }
+    virtual void DelayedStart();
+private:
     SharedPtr<Camera> camera_;
     SharedPtr<Viewport> viewport_;
     SharedPtr<RenderPath> effectRenderPath_;
 
-    Vector3 GetWorldPosition();
-    Quaternion GetRotation();
-private:
-    MasterControl* masterControl_;
-    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
-    SharedPtr<Node> rootNode_;
+    float yaw_;
+    float pitch_;
+    float roll_;
+    float yawDelta_;
+    float pitchDelta_;
+    float forceMultiplier;
 
-    SharedPtr<RigidBody> rigidBody_;
-    float yaw_ = 0.0f;
-    float pitch_ = 0.0f;
-    float roll_ = 0.0f;
-    float yawDelta_ = 0.0f;
-    float pitchDelta_ = 0.0f;
-    float forceMultiplier = 1.0f;
     void SetupViewport();
+    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 };
 
 #endif // TEMPLATECAM_H

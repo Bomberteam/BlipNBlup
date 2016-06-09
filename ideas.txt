@@ -1,3 +1,7 @@
+Portals (Teleporting doors)
+
+Double jump, second is aimed by its timing during the first.
+
 - Adventure Levels and Worlds:
     * Beach
     * Jungle
@@ -18,7 +22,13 @@
 
 Controller support
 
-Inspiration:
-Bubble Bobble
-Super Mario War
-Golf
+#### Inspiration
+
+- Bubble Bobble
+- Super Mario War
+- Golf
+
+
+##### Quotes
+##### Sa'Tong
+> "I'm such an S"

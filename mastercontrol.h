@@ -20,6 +20,7 @@
 #ifndef MASTERCONTROL_H
 #define MASTERCONTROL_H
 
+
 #include <Urho3D/Urho3D.h>
 #include "luckey.h"
 
@@ -29,9 +30,9 @@ class InputMaster;
 class BnBCam;
 class Fish;
 
-typedef struct GameWorld
-{
-    SharedPtr<BnBCam> camera;
+typedef struct GameWorld {
+
+    SharedPtr<BnBCam> camera_;
     SharedPtr<Scene> scene_;
     SharedPtr<Node> voidNode;
     struct {
@@ -39,14 +40,16 @@ typedef struct GameWorld
         SharedPtr<Cursor> uiCursor;
         PODVector<RayQueryResult> hitResults;
     } cursor;
+
 } GameWorld;
 
-typedef struct HitInfo
-{
+typedef struct HitInfo {
+
     Vector3 position_;
     Vector3 hitNormal_;
     Node* hitNode_;
     Drawable* drawable_;
+
 } HitInfo;
 
 enum CharacterID { BLIP = 1, BLUP };
@@ -59,28 +62,32 @@ StringHash const N_CURSOR = StringHash("Cursor");
 class MasterControl : public Application
 {
     URHO3D_OBJECT(MasterControl, Application);
-    friend class InputMaster;
 public:
     MasterControl(Context* context);
-    GameWorld world_;
-    SharedPtr<ResourceCache> cache_;
-    SharedPtr<Graphics> graphics_;
 
-    Fish* GetPlayer(int id = 1);
-    bool PlayerIsAlive(int id = 1);
-    bool PlayerIsHuman(int id = 1);
+    GameWorld world_;
+
+    Vector<int> GetPlayers() const {
+        Vector<int> players;
+        players.Push(1);
+        players.Push(2);
+        return players;
+    }
 
     virtual void Setup();
     virtual void Start();
     virtual void Stop();
     void Exit();
+
+    Fish* GetBlip() { return blip_.Get(); }
+
 private:
     SharedPtr<UI> ui_;
     SharedPtr<Renderer> renderer_;
     SharedPtr<XMLFile> defaultStyle_;
 
-    Fish* blip_;
-    Fish* blup_;
+    SharedPtr<Fish> blip_;
+    SharedPtr<Fish> blup_;
 
     void CreateConsoleAndDebugHud();
     void CreateScene();

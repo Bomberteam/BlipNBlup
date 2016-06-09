@@ -23,34 +23,32 @@
 
 using namespace LucKey;
 
-InputMaster::InputMaster(Context* context, MasterControl* masterControl) : Object(context),
-    masterControl_{masterControl},
-    input_{GetSubsystem<Input>()}
+InputMaster::InputMaster(Context* context) : Object(context)
 {
-    keyBindingsMaster_[KEY_UP]     = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_UP)]    = MasterInputAction::UP;
-    keyBindingsMaster_[KEY_RIGHT]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_RIGHT)] = MasterInputAction::RIGHT;
-    keyBindingsMaster_[KEY_DOWN]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_DOWN)]  = MasterInputAction::DOWN;
-    keyBindingsMaster_[KEY_LEFT]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::DPAD_LEFT)]  = MasterInputAction::LEFT;
-    keyBindingsMaster_[KEY_RETURN] = buttonBindingsMaster_[static_cast<int>(SixaxisButton::CROSS)]      = MasterInputAction::CONFIRM;
-    keyBindingsMaster_[KEY_ESC]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::CIRCLE)]     = MasterInputAction::CANCEL;
-    keyBindingsMaster_[KEY_PAUSE]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::START)]      = MasterInputAction::PAUSE;
-    keyBindingsMaster_[KEY_ESC]    = MasterInputAction::MENU;
+    keyBindingsMaster_[KEY_UP]     = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_UP)]    = MasterInputAction::UP;
+    keyBindingsMaster_[KEY_RIGHT]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_RIGHT)] = MasterInputAction::RIGHT;
+    keyBindingsMaster_[KEY_DOWN]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_DOWN)]  = MasterInputAction::DOWN;
+    keyBindingsMaster_[KEY_LEFT]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_LEFT)]  = MasterInputAction::LEFT;
+    keyBindingsMaster_[KEY_RETURN] = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_CROSS)]      = MasterInputAction::CONFIRM;
+    keyBindingsMaster_[KEY_ESCAPE]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_CIRCLE)]     = MasterInputAction::CANCEL;
+    keyBindingsMaster_[KEY_PAUSE]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_START)]      = MasterInputAction::PAUSE;
+    keyBindingsMaster_[KEY_ESCAPE]    = MasterInputAction::MENU;
 
-    keyBindingsPlayer1_[KEY_W] = keyBindingsPlayer1_[KEY_UP]    = PlayerInputAction::UP;
-    keyBindingsPlayer1_[KEY_D] = keyBindingsPlayer1_[KEY_RIGHT] = PlayerInputAction::RIGHT;
-    keyBindingsPlayer1_[KEY_S] = keyBindingsPlayer1_[KEY_DOWN]  = PlayerInputAction::DOWN;
-    keyBindingsPlayer1_[KEY_A] = keyBindingsPlayer1_[KEY_LEFT]  = PlayerInputAction::LEFT;
-    keyBindingsPlayer1_[KEY_C] = keyBindingsPlayer1_[KEY_LSHIFT] = PlayerInputAction::RUN;
-    keyBindingsPlayer1_[KEY_V] = keyBindingsPlayer1_[KEY_ALT]   = PlayerInputAction::JUMP;
-    keyBindingsPlayer1_[KEY_B] = keyBindingsPlayer1_[KEY_SPACE] = PlayerInputAction::BUBBLE;
+    keyBindingsPlayer_[1][KEY_W] = keyBindingsPlayer_[1][KEY_UP]    = PlayerInputAction::FORWARD;
+    keyBindingsPlayer_[1][KEY_D] = keyBindingsPlayer_[1][KEY_RIGHT] = PlayerInputAction::RIGHT;
+    keyBindingsPlayer_[1][KEY_S] = keyBindingsPlayer_[1][KEY_DOWN]  = PlayerInputAction::BACK;
+    keyBindingsPlayer_[1][KEY_A] = keyBindingsPlayer_[1][KEY_LEFT]  = PlayerInputAction::LEFT;
+    keyBindingsPlayer_[1][KEY_C] = keyBindingsPlayer_[1][KEY_LSHIFT] = PlayerInputAction::RUN;
+    keyBindingsPlayer_[1][KEY_V] = keyBindingsPlayer_[1][KEY_ALT]   = PlayerInputAction::JUMP;
+    keyBindingsPlayer_[1][KEY_B] = keyBindingsPlayer_[1][KEY_SPACE] = PlayerInputAction::BUBBLE;
 
-    keyBindingsPlayer2_[KEY_KP_8]    = PlayerInputAction::UP;
-    keyBindingsPlayer2_[KEY_KP_6]    = PlayerInputAction::RIGHT;
-    keyBindingsPlayer2_[KEY_KP_5]    = PlayerInputAction::DOWN;
-    keyBindingsPlayer2_[KEY_KP_4]    = PlayerInputAction::LEFT;
-    keyBindingsPlayer2_[KEY_RETURN] = PlayerInputAction::RUN;
-    keyBindingsPlayer2_[KEY_RSHIFT]  = PlayerInputAction::JUMP;
-    keyBindingsPlayer2_[KEY_RCTRL]   = PlayerInputAction::BUBBLE;
+    keyBindingsPlayer_[2][KEY_KP_8]    = PlayerInputAction::FORWARD;
+    keyBindingsPlayer_[2][KEY_KP_6]    = PlayerInputAction::RIGHT;
+    keyBindingsPlayer_[2][KEY_KP_5]    = PlayerInputAction::BACK;
+    keyBindingsPlayer_[2][KEY_KP_4]    = PlayerInputAction::LEFT;
+    keyBindingsPlayer_[2][KEY_RETURN] = PlayerInputAction::RUN;
+    keyBindingsPlayer_[2][KEY_RSHIFT]  = PlayerInputAction::JUMP;
+    keyBindingsPlayer_[2][KEY_RCTRL]   = PlayerInputAction::BUBBLE;
 
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(InputMaster, HandleKeyDown));
     SubscribeToEvent(E_KEYUP, URHO3D_HANDLER(InputMaster, HandleKeyUp));
@@ -60,66 +58,87 @@ InputMaster::InputMaster(Context* context, MasterControl* masterControl) : Objec
 }
 
 void InputMaster::HandleUpdate(StringHash eventType, VariantMap &eventData)
-{
+{ (void)eventType; (void)eventData;
+
     InputActions activeActions{};
+    for (int p : MC->GetPlayers()){
+        Vector<PlayerInputAction> emptyActions{};
+        activeActions.player_[p] = emptyActions;
+    }
+
     //Convert key presses to actions
-    for (int k = 0; k < static_cast<int>(pressedKeys_.Size()); k++){
-        int key = pressedKeys_[k];
+    for (int key : pressedKeys_){
+        //Check for master key presses
         if (keyBindingsMaster_.Contains(key)){
-            MasterInputAction action = keyBindingsMaster_[key];
+            MasterInputAction action{keyBindingsMaster_[key]};
             if (!activeActions.master_.Contains(action))
                 activeActions.master_.Push(action);
         }
-        if (keyBindingsPlayer1_.Contains(key)){
-            PlayerInputAction action = keyBindingsPlayer1_[key];
-            if (!activeActions.player1_.Contains(action))
-                activeActions.player1_.Push(action);
-        }
-        if (keyBindingsPlayer2_.Contains(key)){
-            PlayerInputAction action = keyBindingsPlayer2_[key];
-            if (!activeActions.player2_.Contains(action))
-                activeActions.player2_.Push(action);
-        }
+        //Check for player key presses
+        for (int p : MC->GetPlayers())
+            if (keyBindingsPlayer_[p].Contains(key)){
+                PlayerInputAction action{keyBindingsPlayer_[p][key]};
+                if (!activeActions.player_[p].Contains(action))
+                    activeActions.player_[p].Push(action);
+            }
+
     }
+    //Handle the registered actions
     HandleActions(activeActions);
+}
+
+void InputMaster::SetPlayerControl(int player, Controllable* controllable)
+{
+    if (controlledByPlayer_.Contains(player))
+        controlledByPlayer_[player]->ResetInput();
+    controlledByPlayer_[player] = controllable;
 }
 
 void InputMaster::HandleActions(const InputActions& actions)
 {
     //Handle master actions
-    if (actions.master_.Contains(MasterInputAction::MENU)) masterControl_->Exit();
+    if (actions.master_.Contains(MasterInputAction::MENU))
+        MC->Exit();
 
     //Handle player actions
-    if (masterControl_->PlayerIsAlive(BLIP) && masterControl_->PlayerIsHuman(BLIP)){
-        Fish* player1 = masterControl_->GetPlayer(BLIP);
-        Vector2 player1Movement
-                = (Vector2::RIGHT *
-                   (actions.player1_.Contains(PlayerInputAction::RIGHT) -
-                    actions.player1_.Contains(PlayerInputAction::LEFT)))
-                + (Vector2::UP *
-                   (actions.player1_.Contains(PlayerInputAction::UP) -
-                    actions.player1_.Contains(PlayerInputAction::DOWN)));
-        player1Movement = LucKey::Rotate(player1Movement, -masterControl_->world_.camera->GetRotation().EulerAngles().y_);
-        player1->SetRunning(actions.player1_.Contains(PlayerInputAction::RUN));
-        player1->SetMovement(player1Movement);
-        if (actions.player1_.Contains(PlayerInputAction::JUMP)) player1->Jump();
-        else player1->JumpRelease();
+    for (int p : MC->GetPlayers()){
+        auto playerInputActions = actions.player_[p];
+
+        Controllable* controlled{controlledByPlayer_[p]};
+        if (controlled){
+
+            controlled->move_ = GetMoveFromActions(playerInputActions);
+
+            std::bitset<4>otherActions{};
+            otherActions[0] = playerInputActions->Contains(PlayerInputAction::RUN);
+            otherActions[1] = playerInputActions->Contains(PlayerInputAction::JUMP);
+            otherActions[2] = playerInputActions->Contains(PlayerInputAction::BUBBLE);
+
+            controlled->SetActions(otherActions);
+        }
     }
-    if (masterControl_->PlayerIsAlive(BLUP) && masterControl_->PlayerIsHuman(BLUP)){
-        Fish* player2 = masterControl_->GetPlayer(BLUP);
-        Vector2 player2Movement
-                = (Vector2::RIGHT *
-                   (actions.player2_.Contains(PlayerInputAction::RIGHT) -
-                    actions.player2_.Contains(PlayerInputAction::LEFT)))
-                + (Vector2::UP *
-                   (actions.player2_.Contains(PlayerInputAction::UP) -
-                    actions.player2_.Contains(PlayerInputAction::DOWN)));
-        player2Movement = LucKey::Rotate(player2Movement, -masterControl_->world_.camera->GetRotation().EulerAngles().y_);
-        player2->SetRunning(actions.player2_.Contains(PlayerInputAction::RUN));
-        player2->SetMovement(player2Movement);
-        if (actions.player2_.Contains(PlayerInputAction::JUMP)) player2->Jump();
-        else player2->JumpRelease();
-    }
+}
+Vector3 InputMaster::GetMoveFromActions(Vector<PlayerInputAction>* actions)
+{
+    Vector3 move{Vector3::RIGHT *
+                (actions->Contains(PlayerInputAction::RIGHT) -
+                 actions->Contains(PlayerInputAction::LEFT))
+
+                + Vector3::UP *
+                (actions->Contains(PlayerInputAction::UP) -
+                 actions->Contains(PlayerInputAction::DOWN))
+
+                + Vector3::FORWARD *
+                (actions->Contains(PlayerInputAction::FORWARD) -
+                 actions->Contains(PlayerInputAction::BACK))
+                };
+
+//    if (MC->world_.camera_){
+//        Vector3 camRot{MC->world_.camera_->GetRotation().EulerAngles()};
+//        move = Quaternion(camRot.y_, Vector3::UP) * move;
+//    }
+
+    return move;
 }
 
 void InputMaster::HandleKeyDown(StringHash eventType, VariantMap &eventData)
@@ -127,22 +146,22 @@ void InputMaster::HandleKeyDown(StringHash eventType, VariantMap &eventData)
     int key = eventData[KeyDown::P_KEY].GetInt();
     if (!pressedKeys_.Contains(key)) pressedKeys_.Push(key);
 
-//    switch (key){
-//    case KEY_ESC:{
-//        masterControl_->Exit();
-//    } break;
-//    case KEY_9:{
-//        Image screenshot(context_);
-//        Graphics* graphics = GetSubsystem<Graphics>();
-//        graphics->TakeScreenShot(screenshot);
-//        //Here we save in the Data folder with date and time appended
-//        String fileName = GetSubsystem<FileSystem>()->GetProgramDir() + "Screenshots/Screenshot_" +
-//                Time::GetTimeStamp().Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_')+".png";
-//        //Log::Write(1, fileName);
-//        screenshot.SavePNG(fileName);
-//    } break;
-//    default: break;
-//    }
+    switch (key){
+    case KEY_ESCAPE:{
+        MC->Exit();
+    } break;
+    case KEY_9:{
+        Image screenshot(context_);
+        Graphics* graphics = GetSubsystem<Graphics>();
+        graphics->TakeScreenShot(screenshot);
+        //Here we save in the Data folder with date and time appended
+        String fileName = GetSubsystem<FileSystem>()->GetProgramDir() + "Screenshots/Screenshot_" +
+                Time::GetTimeStamp().Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_')+".png";
+        //Log::Write(1, fileName);
+        screenshot.SavePNG(fileName);
+    } break;
+    default: break;
+    }
 }
 
 void InputMaster::HandleKeyUp(StringHash eventType, VariantMap &eventData)

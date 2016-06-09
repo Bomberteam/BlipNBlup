@@ -23,35 +23,35 @@
 #include <Urho3D/Urho3D.h>
 #include "mastercontrol.h"
 #include "luckey.h"
+#include "controllable.h"
 
 using namespace Urho3D;
 
-class Fish : public Object
-{
-    friend class MasterControl;
-    URHO3D_OBJECT(Fish, Object);
-public:
-    Fish(Context *context, MasterControl *masterControl, CharacterID id = BLIP);
+enum class FishState{ STAND, WALK, RUN, JUMP, FALL, OUT};
 
-    Vector3 GetPosition() { return rootNode_->GetWorldPosition(); }
-    bool IsAlive() { return alive_; }
-    bool IsHuman() { return human_; }
-    void SetMovement(const Vector2 movement);
+class Fish : public Controllable
+{
+    URHO3D_OBJECT(Fish, Controllable);
+public:
+    Fish(Context* context);
+    static void RegisterObject(Context* context);
+
     void Jump();
-    void JumpRelease() { if (onGround_) jumpReleased_ = true; }
-    void SetRunning(const bool running) { running_ = running; }
+    virtual void OnNodeSet(Node* node);
+    void Create();
+
+    virtual void Update(float timeStep);
+    void BecomeBlup();
+protected:
+    void HandleAction(int actionId);
 private:
     MasterControl * masterControl_;
 
-    Node* rootNode_;
-    AnimatedModel* model_;
+    StaticModel* model_;
     RigidBody* rigidBody_;
     CollisionShape* collider_;
     AnimationController* animCtrl_;
-    CharacterID id_;
-    bool human_;
-    bool alive_;
-    bool running_;
+
     bool onGround_;
     bool doubleJumped_;
     bool jumpReleased_;
@@ -68,6 +68,8 @@ private:
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleNodeCollision(StringHash eventType, VariantMap &eventData);
     void Move(float timeStep);
+
+
     void Blink();
     void Think();
 };

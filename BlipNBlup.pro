@@ -5,7 +5,7 @@ LIBS += ../BlipNBlup/Urho3D/lib/libUrho3D.a \
 
 DEFINES += URHO3D_COMPILE_QT
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++14
 
 INCLUDEPATH += \
     ../BlipNBlup/Urho3D/include \
@@ -22,6 +22,7 @@ SOURCES += \
     inputmaster.cpp \
     bnbcam.cpp \
     fish.cpp \
+    controllable.cpp
 
 HEADERS += \
     luckey.h \
@@ -29,3 +30,4 @@ HEADERS += \
     inputmaster.h \
     bnbcam.h \
     fish.h \
+    controllable.h

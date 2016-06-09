@@ -21,7 +21,7 @@
 #define INPUTMASTER_H
 
 #include <Urho3D/Urho3D.h>
-#include "mastercontrol.h"
+#include "controllable.h"
 #include "luckey.h"
 
 namespace Urho3D {
@@ -32,29 +32,26 @@ class Sprite;
 }
 
 enum class MasterInputAction { UP, RIGHT, DOWN, LEFT, CONFIRM, CANCEL, PAUSE, MENU, SCREENSHOT };
-enum class PlayerInputAction { UP, RIGHT, DOWN, LEFT, RUN, JUMP, BUBBLE };
+enum class PlayerInputAction { FORWARD, BACK, LEFT, RIGHT, UP, DOWN, RUN, JUMP, BUBBLE };
 
 struct InputActions {
     Vector<MasterInputAction> master_;
-    Vector<PlayerInputAction> player1_;
-    Vector<PlayerInputAction> player2_;
+    HashMap<int, Vector<PlayerInputAction>> player_;
 };
 
 class InputMaster : public Object
 {
     URHO3D_OBJECT(InputMaster, Object);
 public:
-    InputMaster(Context* context, MasterControl* masterControl);
+    InputMaster(Context* context);
+    void SetPlayerControl(int player, Controllable* controllable);
 private:
-    MasterControl* masterControl_;
-    Input* input_;
-
     HashMap<int, MasterInputAction> keyBindingsMaster_;
     HashMap<int, MasterInputAction> buttonBindingsMaster_;
-    HashMap<int, PlayerInputAction> keyBindingsPlayer1_;
-    HashMap<int, PlayerInputAction> buttonBindingsPlayer1_;
-    HashMap<int, PlayerInputAction> keyBindingsPlayer2_;
-    HashMap<int, PlayerInputAction> buttonBindingsPlayer2_;
+    HashMap<int, HashMap<int, PlayerInputAction>> keyBindingsPlayer_;
+    HashMap<int, HashMap<int, PlayerInputAction>> buttonBindingsPlayer_;
+
+    HashMap<int, Controllable*> controlledByPlayer_;
 
     Vector<int> pressedKeys_;
     Vector<LucKey::SixaxisButton> pressedJoystickButtons_;
@@ -67,6 +64,7 @@ private:
 
     void HandleActions(const InputActions &actions);
     void HandlePlayerAction(PlayerInputAction action, CharacterID player = BLIP);
+    Vector3 GetMoveFromActions(Vector<PlayerInputAction>* actions);
 };
 
 #endif // INPUTMASTER_H

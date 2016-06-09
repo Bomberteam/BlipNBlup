@@ -28,29 +28,29 @@ MasterControl::MasterControl(Context *context):
     Application(context),
     paused_{false}
 {
+    Fish::RegisterObject(context_);
+    BnBCam::RegisterObject(context_);
 }
 
 void MasterControl::Setup()
 {
     engineParameters_["WindowTitle"] = "Blip 'n Blup: Skyward Adventures";
     engineParameters_["LogName"] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs")+"blipnblup.log";
+    engineParameters_["ResourcePaths"] = "Data;CoreData;Resources";
 }
 void MasterControl::Start()
 {
-    new InputMaster(context_, this);
-    cache_ = GetSubsystem<ResourceCache>();
-    graphics_ = GetSubsystem<Graphics>();
-    renderer_ = GetSubsystem<Renderer>();
+    context_->RegisterSubsystem(new InputMaster(context_));
 
-    defaultStyle_ = cache_->GetResource<XMLFile>("UI/DefaultStyle.xml");
+    defaultStyle_ = CACHE->GetResource<XMLFile>("UI/DefaultStyle.xml");
     CreateConsoleAndDebugHud();
     CreateScene();
     CreateUI();
     SubscribeToEvents();
 
-    Sound* music = cache_->GetResource<Sound>("Resources/Music/XL Ant - No-Trace Land.ogg");
+    Sound* music{CACHE->GetResource<Sound>("Resources/Music/XL Ant - No-Trace Land.ogg")};
     music->SetLooped(true);
-    SoundSource* musicSource = world_.scene_->CreateComponent<SoundSource>();
+    SoundSource* musicSource{world_.scene_->CreateComponent<SoundSource>()};
     musicSource->SetGain(0.32f);
     musicSource->SetSoundType(SOUND_MUSIC);
     musicSource->Play(music);
@@ -66,29 +66,27 @@ void MasterControl::Exit()
 
 void MasterControl::SubscribeToEvents()
 {
-    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(MasterControl, HandleUpdate));
-    SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(MasterControl, HandleUpdate));
 }
 
 void MasterControl::CreateConsoleAndDebugHud()
 {
-    Console* console = engine_->CreateConsole();
+    Console* console{engine_->CreateConsole()};
     console->SetDefaultStyle(defaultStyle_);
     console->GetBackground()->SetOpacity(0.8f);
 
-    DebugHud* debugHud = engine_->CreateDebugHud();
+    DebugHud* debugHud{engine_->CreateDebugHud()};
     debugHud->SetDefaultStyle(defaultStyle_);
 }
 
 void MasterControl::CreateUI()
 {
-    cache_ = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+//    cache_ = GetSubsystem<ResourceCache>();
+//    UI* ui = GetSubsystem<UI>();
 
-    world_.cursor.uiCursor = new Cursor(context_);
-    world_.cursor.uiCursor->SetVisible(false);
-    ui->SetCursor(world_.cursor.uiCursor);
-    world_.cursor.uiCursor->SetPosition(graphics_->GetWidth()/2, graphics_->GetHeight()/2);
+//    world_.cursor.uiCursor = new Cursor(context_);
+//    world_.cursor.uiCursor->SetVisible(false);
+//    ui->SetCursor(world_.cursor.uiCursor);
+//    world_.cursor.uiCursor->SetPosition(graphics_->GetWidth()/2, graphics_->GetHeight()/2);
 }
 
 void MasterControl::CreateScene()
@@ -102,30 +100,30 @@ void MasterControl::CreateScene()
     physicsWorld->SetGravity(Vector3::DOWN*42.0f);
 
     //Add sky
-    Node* skyNode = world_.scene_->CreateChild("Sky");
-    Skybox* skybox = skyNode->CreateComponent<Skybox>();
-    skybox->SetModel(cache_->GetResource<Model>("Models/Box.mdl"));
-    skybox->SetMaterial(cache_->GetResource<Material>("Materials/Skybox.xml"));
+    Node* skyNode{world_.scene_->CreateChild("Sky")};
+    Skybox* skybox{skyNode->CreateComponent<Skybox>()};
+    skybox->SetModel(CACHE->GetResource<Model>("Models/Box.mdl"));
+    skybox->SetMaterial(CACHE->GetResource<Material>("Materials/Skybox.xml"));
 
     //Add ground
-    Node* groundNode = world_.scene_->CreateChild("Ground");
-    groundNode->SetScale(5.0f);
-    groundNode->Translate(Vector3::DOWN*5.0f);
-    StaticModel* groundModel = groundNode->CreateComponent<StaticModel>();
-    Model* phyisicalModel = cache_->GetResource<Model>("Resources/Models/Level1_physical.mdl");
+    Node* groundNode{world_.scene_->CreateChild("Ground")};
+    groundNode->SetScale(1.0f);
+    groundNode->Translate(Vector3(-1.0f, -0.5f, 0.0f));
+    StaticModel* groundModel{groundNode->CreateComponent<StaticModel>()};
+    Model* phyisicalModel{CACHE->GetResource<Model>("Resources/Models/Level1_physical.mdl")};
     groundModel->SetModel(phyisicalModel);
-    groundModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
+    groundModel->SetMaterial(CACHE->GetResource<Material>("Resources/Materials/VCol.xml"));
     groundModel->SetCastShadows(true);
-    RigidBody* groundBody = groundNode->CreateComponent<RigidBody>();
+    RigidBody* groundBody{groundNode->CreateComponent<RigidBody>()};
     groundBody->SetFriction(0.8f);
-    CollisionShape* groundCollider = groundNode->CreateComponent<CollisionShape>();
+    CollisionShape* groundCollider{groundNode->CreateComponent<CollisionShape>()};
     groundCollider->SetTriangleMesh(phyisicalModel);//SetBox(Vector3(23.0f, 2.0f, 23.0f), Vector3::DOWN);
 
     //Create a directional light to the world. Enable cascaded shadows on it
-    Node* lightNode = world_.scene_->CreateChild("DirectionalLight");
+    Node* lightNode{world_.scene_->CreateChild("DirectionalLight")};
     lightNode->SetPosition(Vector3(-5.0f, 10.0f, -7.0f));
     lightNode->LookAt(Vector3(0.0f, 0.0f, 0.0f));
-    Light* light = lightNode->CreateComponent<Light>();
+    Light* light{lightNode->CreateComponent<Light>()};
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetBrightness(0.9f);
     light->SetColor(Color(0.8f, 0.95f, 0.9f));
@@ -133,99 +131,32 @@ void MasterControl::CreateScene()
     light->SetShadowBias(BiasParameters(0.000125f, 0.5f));
     light->SetShadowCascade(CascadeParameters(7.0f, 23.0f, 42.0f, 500.0f, 0.8f));
 
-    //Create some Fish
-    for (int k = 0; k < 0; k++){
-        Node* objectNode = world_.scene_->CreateChild("Fish");
-        objectNode->SetPosition((-5.0f + 3.0f*k) * Vector3::RIGHT + (k%2) * 5.0f * Vector3::FORWARD);
-        objectNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
-        objectNode->SetScale(0.8f);
+    //Create fish
+    Node* blipNode{world_.scene_->CreateChild("Blip")};
+    blip_ = blipNode->CreateComponent<Fish>();
+    GetSubsystem<InputMaster>()->SetPlayerControl(1, blip_);
 
-        AnimatedModel* animatedModel = objectNode->CreateComponent<AnimatedModel>();
-        if (Random(2)) {
-            animatedModel->SetModel(cache_->GetResource<Model>("Resources/Models/Blip.mdl"));
-        } else {
-            animatedModel->SetModel(cache_->GetResource<Model>("Resources/Models/Blup.mdl"));
-            animatedModel->SetMorphWeight(1,1.0f);
-        }
-        animatedModel->SetMorphWeight(0,Random(0.0f, 0.5f));
-        animatedModel->SetMaterial(cache_->GetResource<Material>("Resources/Materials/VCol.xml"));
-        animatedModel->SetCastShadows(true);
-
-        AnimationController* animCtrl = objectNode->CreateComponent<AnimationController>();
-        animCtrl->PlayExclusive("Resources/Models/Walk.ani", 0, true);
-        animCtrl->SetSpeed("Resources/Models/Walk.ani", Random(1.0f,2.0f));
-    }
-
-    //Create a player
-    blip_ = new Fish(context_, this, BLIP);
-    blip_->rootNode_->SetPosition(Vector3::LEFT*7.0f);
-    blup_ = new Fish(context_, this, BLUP);
-    blup_->rootNode_->SetPosition(Vector3::RIGHT*3.0f);
-    blup_->human_ = false;
+    Node* blupNode{world_.scene_->CreateChild("Blup")};
+    blup_ = blupNode->CreateComponent<Fish>();
+    blup_->BecomeBlup();
+    GetSubsystem<InputMaster>()->SetPlayerControl(2, blup_);
 
     //Create camera
-    world_.camera = new BnBCam(context_, this);
+    Node* camNode{world_.scene_->CreateChild("Camera")};
+    world_.camera_ = camNode->CreateComponent<BnBCam>();
+
+    //Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
+    Viewport* viewport(new Viewport(context_, world_.scene_, world_.camera_->GetCamera()));
+
+    RenderPath* effectRenderPath{viewport->GetRenderPath()};
+    effectRenderPath->Append(CACHE->GetResource<XMLFile>("PostProcess/FXAA3.xml"));
+    effectRenderPath->SetEnabled("FXAA3", true);
+
+    effectRenderPath->Append(CACHE->GetResource<XMLFile>("PostProcess/BloomHDR.xml"));
+    effectRenderPath->SetShaderParameter("BloomHDRThreshold", 0.42f);
+    effectRenderPath->SetShaderParameter("BloomHDRMix", Vector2(0.9f, 0.23f));
+    effectRenderPath->SetEnabled("BloomHDR", true);
+
+    viewport->SetRenderPath(effectRenderPath);
+    RENDERER->SetViewport(0, viewport);
 }
-
-void MasterControl::HandleUpdate(StringHash eventType, VariantMap &eventData)
-{
-    float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
-}
-
-Fish *MasterControl::GetPlayer(int id) {
-    assert(id == 1 || id == 2);
-    switch (id){
-    case 1: return blip_; break;
-    case 2: return blup_; break;
-    default: return nullptr; break;}
-}
-bool MasterControl::PlayerIsAlive(int id) {
-    assert(id == 1 || id == 2);
-    Fish* player = GetPlayer(id);
-    if (player != nullptr) return player->IsAlive();
-    else return false;
-}
-bool MasterControl::PlayerIsHuman(int id) {
-    assert(id == 1 || id == 2);
-    Fish* player = GetPlayer(id);
-    if (player != nullptr) return player->IsHuman();
-    else return false;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
