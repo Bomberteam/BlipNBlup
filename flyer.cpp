@@ -18,6 +18,7 @@
 */
 
 #include "flyer.h"
+#include "catchable.h"
 #include "castmaster.h"
 
 
@@ -40,10 +41,14 @@ void Flyer::OnNodeSet(Node* node)
 
 void Flyer::Update(float timeStep)
 {
+    if (node_->HasComponent<Catchable>()
+     && node_->GetComponent<Catchable>()->IsCatched())
+        return;
+
     //Hover
     rigidBody_->ApplyForce(Vector3::UP * flyThrust_ * 10.0f *
-                           (altitude_ - node_->GetPosition().y_) *
-                           MC->Sine(2.3f, 0.7f, 1.0f) * timeStep);
+                           (altitude_ - node_->GetPosition().y_ - rigidBody_->GetLinearVelocity().y_ * 0.1f) *
+                           MC->Sine(1.0f - 0.23f * randomizer_, 0.7f, 2.0f, randomizer_) * timeStep);
     //Fly
     if (rigidBody_->GetLinearVelocity().Length() < maxFlySpeed_
             || (rigidBody_->GetLinearVelocity().Normalized() + move_.Normalized()).Length() < 1.0f)
@@ -63,5 +68,5 @@ void Flyer::CorrectAltitude()
     GetSubsystem<CastMaster>()->PhysicsRayCast(results, floorRay, 1024.0f, LAYER(0));
 
     if (results.Size())
-        altitude_ = results[0].position_.y_ + 3.0f;
+        altitude_ = results[0].position_.y_ + 2.3f;
 }

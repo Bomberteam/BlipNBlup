@@ -18,6 +18,7 @@
 */
 
 #include "wasp.h"
+#include "catchable.h"
 #include "castmaster.h"
 #include "resourcemaster.h"
 
@@ -38,15 +39,15 @@ void Wasp::RegisterObject(Context* context)
 }
 
 void Wasp::OnNodeSet(Node *node)
-{
+{   Flyer::OnNodeSet(node);
 
-    Flyer::OnNodeSet(node);
+    node_->CreateComponent<Catchable>();
 
-    node_->Translate(Quaternion(Random(360.0f), Vector3::UP) * Random(2.0f) * Vector3::FORWARD + Vector3::UP * 5.0f);
+    node_->Translate(Quaternion(Random(360.0f), Vector3::UP) * Random(2.0f) * Vector3::FORWARD + Vector3::UP * Random(3.0f, 5.0f));
     node_->Rotate(Quaternion(Random(360.0f), Vector3::UP));
 
     model_->SetModel(RM->GetModel("Wasp"));
-    model_->SetMaterial(RM->GetMaterial("VCol"));
+    model_->SetMaterial(RM->GetMaterial("VCol")->Clone());
 
     rigidBody_->SetCollisionLayer(LAYER(2));
     rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2));
@@ -57,8 +58,8 @@ void Wasp::OnNodeSet(Node *node)
 
 void Wasp::Update(float timeStep)
 {
-    Flyer::Update(timeStep);
-
     move_ = Quaternion(5.0f, Vector3::UP) * node_->GetDirection();
+    Flyer::Update(timeStep);
+//    model_->GetMaterial()->SetShaderParameter("MatEmissiveColor", Color::RED * MC->Sine(2.3f, 0.0f, 0.5f, randomizer_));
 }
 

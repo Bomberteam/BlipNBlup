@@ -25,7 +25,7 @@ Fish::Fish(Context *context) : Walker(context),
     bubbleInterval_{0.5f},
     sinceBubble_{bubbleInterval_}
 {
-    runThrust_ = 10000.0f;
+    runThrust_ = 34000.0f;
     maxRunSpeed_ = 5.0f;
 
     jumpForce_ = 34.0f;
@@ -87,7 +87,7 @@ void Fish::BlowBubble()
         sinceBubble_ = 0.0f;
 
         Node* bubbleNode{MC->GetScene()->CreateChild("Bubble")};
-        bubbleNode->SetPosition(node_->GetPosition());
+        bubbleNode->SetPosition(node_->GetPosition() + node_->GetDirection() * 0.1f);
         bubbleNode->CreateComponent<Bubble>();
         RigidBody* bubbleBody{bubbleNode->GetComponent<RigidBody>()};
         bubbleBody->SetLinearVelocity(rigidBody_->GetLinearVelocity());

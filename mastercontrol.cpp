@@ -22,6 +22,7 @@
 #include "fish.h"
 #include "bubble.h"
 #include "wind.h"
+#include "catchable.h"
 #include "wasp.h"
 #include "resourcemaster.h"
 #include "inputmaster.h"
@@ -38,6 +39,7 @@ MasterControl::MasterControl(Context *context):
     Bubble::RegisterObject(context_);
     Wind::RegisterObject(context_);
 
+    Catchable::RegisterObject(context_);
     Wasp::RegisterObject(context_);
 }
 
@@ -50,6 +52,8 @@ void MasterControl::Setup()
 }
 void MasterControl::Start()
 {
+    SetRandomSeed(TIME->GetSystemTime());
+
     context_->RegisterSubsystem(this);
     context_->RegisterSubsystem(new ResourceMaster(context_));
     context_->RegisterSubsystem(new InputMaster(context_));
@@ -114,7 +118,7 @@ void MasterControl::CreateScene()
     scene_->CreateComponent<DebugRenderer>();
 
     scene_->CreateComponent<PhysicsWorld>();
-    scene_->GetComponent<PhysicsWorld>()->SetGravity(Vector3::DOWN*42.0f);
+    scene_->GetComponent<PhysicsWorld>()->SetGravity(GRAVITY);
 
     //Add sky
     Node* skyNode{scene_->CreateChild("Sky")};
@@ -161,7 +165,7 @@ void MasterControl::CreateScene()
     GetSubsystem<InputMaster>()->SetPlayerControl(2, blup_);
 
     //Create wasps
-    for (int w{0}; w < 5; ++w) {
+    for (int w{0}; w < 23; ++w) {
         Node* waspNode{scene_->CreateChild("Wasp")};
         waspNode->CreateComponent<Wasp>();
     }
@@ -191,13 +195,15 @@ void MasterControl::HandlePostRenderUpdate(StringHash eventType, VariantMap& eve
 
 float MasterControl::Sine(const float freq, const float min, const float max, const float shift)
 {
-    float phase{freq * scene_->GetElapsedTime() + shift};
+    float phase{SinePhase(freq, shift)};
     float add{0.5f * (min + max)};
     return LucKey::Sine(phase) * 0.5f * (max - min) + add;
 }
 float MasterControl::Cosine(const float freq, const float min, const float max, const float shift)
 {
-    float phase{freq * scene_->GetElapsedTime() + shift};
-    float add{0.5f * (min + max)};
-    return LucKey::Cosine(phase) * 0.5f * (max - min) + add;
+    return Sine(freq, min, max, shift + 0.25f);
+}
+float MasterControl::SinePhase(float freq, float shift)
+{
+    return M_PI * 2.0f * (freq * scene_->GetElapsedTime() + shift);
 }

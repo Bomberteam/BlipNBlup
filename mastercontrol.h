@@ -58,6 +58,7 @@ StringHash const N_VOID = StringHash("Void");
 StringHash const N_CURSOR = StringHash("Cursor");
 }
 
+#define GRAVITY Vector3::DOWN * 42.0f
 #define RM GetSubsystem<ResourceMaster>()
 
 class MasterControl : public Application
@@ -114,6 +115,7 @@ private:
     bool paused_;
     bool drawDebug_{false};
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+    float SinePhase(float freq, float shift);
 };
 
 #endif // MASTERCONTROL_H

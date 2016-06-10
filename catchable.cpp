@@ -17,27 +17,35 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "wind.h"
+#include "catchable.h"
 #include "bubble.h"
 
-Wind::Wind(Context* context) : LogicComponent(context)
+Catchable::Catchable(Context* context) : LogicComponent(context),
+    catched_{false}
 {
+
 }
 
-void Wind::RegisterObject(Context *context)
+void Catchable::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Wind>();
+    context->RegisterFactory<Catchable>();
 }
 
-void Wind::Update(float timeStep)
+bool Catchable::Catch(Bubble* bubble)
 {
-    if (node_->HasComponent<Bubble>() && !node_->GetComponent<Bubble>()->IsEmpty())
-        return;
-
-    RigidBody* rigidBody{node_->GetComponent<RigidBody>()};
-    if (rigidBody){
-        rigidBody->ApplyForce(Vector3::LEFT *
-                              MC->Sine(0.23f, -10.0f, 50.0f, 0.1f * node_->GetPosition().y_) * timeStep);
+    if (!catched_){
+        catched_ = true;
+        if (node_->HasComponent<RigidBody>()){
+            node_->GetComponent<RigidBody>()->SetEnabled(false);
+        }
+        node_->SetParent(bubble->GetNode());
+        node_->SetPosition(Vector3::ZERO);
+        return true;
     }
+    return false;
 }
-
+void Catchable::Release()
+{
+    node_->SetParent(MC->GetScene());
+    catched_ = false;
+}

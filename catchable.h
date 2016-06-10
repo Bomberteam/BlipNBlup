@@ -17,27 +17,25 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "wind.h"
-#include "bubble.h"
+#ifndef CATCHABLE_H
+#define CATCHABLE_H
 
-Wind::Wind(Context* context) : LogicComponent(context)
+#include <Urho3D/Urho3D.h>
+#include "luckey.h"
+
+class Bubble;
+
+class Catchable : public LogicComponent
 {
-}
+    URHO3D_OBJECT(Catchable, LogicComponent);
+public:
+    Catchable(Context* context);
+    static void RegisterObject(Context *context);
+    bool IsCatched() const { return catched_; }
+    bool Catch(Bubble* bubble);
+    void Release();
+private:
+    bool catched_;
+};
 
-void Wind::RegisterObject(Context *context)
-{
-    context->RegisterFactory<Wind>();
-}
-
-void Wind::Update(float timeStep)
-{
-    if (node_->HasComponent<Bubble>() && !node_->GetComponent<Bubble>()->IsEmpty())
-        return;
-
-    RigidBody* rigidBody{node_->GetComponent<RigidBody>()};
-    if (rigidBody){
-        rigidBody->ApplyForce(Vector3::LEFT *
-                              MC->Sine(0.23f, -10.0f, 50.0f, 0.1f * node_->GetPosition().y_) * timeStep);
-    }
-}
-
+#endif // CATCHABLE_H

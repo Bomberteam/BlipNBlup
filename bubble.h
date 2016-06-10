@@ -23,6 +23,10 @@
 #include <Urho3D/Urho3D.h>
 #include "luckey.h"
 
+#define BUBBLE_WEIGHT 0.1f
+
+class Catchable;
+
 class Bubble : public LogicComponent
 {
     URHO3D_OBJECT(Bubble, LogicComponent);
@@ -33,10 +37,16 @@ public:
     virtual void OnNodeSet(Node* node);
 
     void Update(float timeStep);
+    void HandleNodeCollisionStart(StringHash eventType, VariantMap& eventData);
+
+    bool IsEmpty() const { return empty_; }
 private:
+    bool empty_;
     SharedPtr<StaticModel> model_;
     SharedPtr<RigidBody> rigidBody_;
     SharedPtr<CollisionShape> collider_;
+
+    Catchable* catchable_;
 };
 
 #endif // BUBBLE_H

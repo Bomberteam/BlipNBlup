@@ -29,7 +29,8 @@ SOURCES += \
     wind.cpp \
     flyer.cpp \
     wasp.cpp \
-    resourcemaster.cpp
+    resourcemaster.cpp \
+    catchable.cpp
 
 HEADERS += \
     luckey.h \
@@ -44,4 +45,5 @@ HEADERS += \
     wind.h \
     flyer.h \
     wasp.h \
-    resourcemaster.h
+    resourcemaster.h \
+    catchable.h

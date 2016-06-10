@@ -31,8 +31,8 @@ class Controllable : public LogicComponent
 public:
     Controllable(Context* context);
     virtual void OnNodeSet(Node* node);
-    void SetActions(std::bitset<4> actions);
 protected:
+    float randomizer_;
     bool controlled_;
     Vector3 move_;
     Vector3 aim_;
@@ -47,11 +47,13 @@ protected:
     float minPitch_;
 
     void ResetInput() { move_ = aim_ = Vector3::ZERO; actions_.reset(); }
-    virtual void HandleAction(int actionId);
+    void SetActions(std::bitset<4> actions);
     void ClampPitch(Quaternion& rot);
 
     void AlignWithVelocity(float timeStep);
     void AlignWithMovement(float timeStep);
+
+    virtual void HandleAction(int actionId);
 };
 
 #endif // CONTROLLABLE_H

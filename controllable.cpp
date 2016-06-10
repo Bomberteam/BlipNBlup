@@ -20,6 +20,7 @@
 #include "controllable.h"
 
 Controllable::Controllable(Context* context) : LogicComponent(context),
+    randomizer_{Random()},
     controlled_{false},
     move_{},
     aim_{},
@@ -75,12 +76,12 @@ void Controllable::AlignWithVelocity(float timeStep)
 
 void Controllable::ClampPitch(Quaternion& rot)
 {
-    float minCorrection{rot.EulerAngles().x_ - maxPitch_};
-    if (minCorrection > 0.0f)
+    float maxCorrection{rot.EulerAngles().x_ - maxPitch_};
+    if (maxCorrection > 0.0f)
+        rot = Quaternion(-maxCorrection, node_->GetRight()) * rot;
+    float minCorrection{rot.EulerAngles().x_ - minPitch_};
+    if (minCorrection < 0.0f)
         rot = Quaternion(-minCorrection, node_->GetRight()) * rot;
-    float maxCorrection{rot.EulerAngles().x_ + minPitch_};
-    if (maxCorrection < 0.0f)
-        rot = Quaternion(maxCorrection, node_->GetRight()) * rot;
 }
 
 

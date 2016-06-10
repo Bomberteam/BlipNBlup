@@ -26,8 +26,9 @@ Walker::Walker(Context* context) : Controllable(context),
     doubleJumped_{false},
     sinceJump_{0.0f}
 {
+    maxPitch_ = 60.0f;
+    minPitch_ = -80.0f;
     SetUpdateEventMask(USE_UPDATE);
-
 }
 
 void Walker::OnNodeSet(Node *node)
@@ -49,8 +50,8 @@ void Walker::Update(float timeStep)
     sinceJump_ += timeStep;
 
     bool run{actions_[0] * onGround_};
-    float walkMultiplier{0.6f + 0.4f * run};
-    float maxWalkSpeed{maxRunSpeed_ * walkMultiplier};
+    float maxWalkSpeed{maxRunSpeed_ * (0.6f + 0.4f * run)};
+    float walkThrust{runThrust_ * (0.8f + 0.2f * run)};
 
     PODVector<RigidBody*> bodies{};
     rigidBody_->GetCollidingBodies(bodies);
@@ -61,11 +62,13 @@ void Walker::Update(float timeStep)
     if (move_.Length() > 0.0f){
         AlignWithMovement(timeStep);
 
-        rigidBody_->SetFriction(1.0f * onGround_);
-        Vector3 force{runThrust_ * walkMultiplier * move_ * timeStep};
+        Vector3 velocity{rigidBody_->GetLinearVelocity()};
 
-        if (rigidBody_->GetLinearVelocity().Length() < maxWalkSpeed
-         || (rigidBody_->GetLinearVelocity().Normalized() + force.Normalized()).Length() < 1.0f)
+        rigidBody_->SetFriction(1.0f * onGround_);
+        Vector3 force{walkThrust * timeStep * move_};
+
+        if (velocity.Length() < maxWalkSpeed
+         || (velocity.Normalized() + force.Normalized()).Length() < M_SQRT2)
         {
             rigidBody_->ApplyForce(force);
         }
