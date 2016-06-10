@@ -51,7 +51,7 @@ void Walker::Update(float timeStep)
         rot = rot.Slerp(targetRot, Clamp(timeStep * 23.0f, 0.0f, 1.0f));
         node_->SetRotation(rot);
 
-        rigidBody_->SetFriction(0.5f * onGround_);
+        rigidBody_->SetFriction(1.0f * onGround_);
         Vector3 force{runThrust_ * walkMultiplier * move_ * timeStep};
 
         if (rigidBody_->GetLinearVelocity().Length() < maxWalkSpeed
@@ -118,17 +118,17 @@ void Walker::AlignWithFloor(float timeStep)
         float angleDelta{rot.EulerAngles().Angle(targetRot.EulerAngles())};
         if (angleDelta > 1.0f)
             ///Should rotate around hit point
-            node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (3.0f + 2.0f * angleDelta), 0.0f, 1.0f)));
+            node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (3.0f + angleDelta), 0.0f, 1.0f)));
     }
 }
 void Walker::AlignWithMovement(float timeStep)
 {
     Quaternion targetRot{};
     Quaternion rot{node_->GetRotation()};
-    targetRot.FromLookRotation(rigidBody_->GetLinearVelocity());
+    targetRot.FromLookRotation(rigidBody_->GetLinearVelocity()+node_->GetDirection()*0.1f);
     ClampPitch(targetRot);
     float horizontalVelocity{(rigidBody_->GetLinearVelocity() * Vector3(1.0f, 0.0f, 1.0f)).Length()};
-    node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (0.1f + 1.3f * horizontalVelocity), 0.0f, 1.0f)));
+    node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (0.5f + 1.0f * horizontalVelocity), 0.0f, 1.0f)));
 }
 
 void Walker::Jump()
@@ -152,7 +152,10 @@ void Walker::Jump()
 
 void Walker::ClampPitch(Quaternion& rot)
 {
-    float correction{rot.EulerAngles().x_ - 70.0f};
-    if (correction > 0.0f)
-        rot = Quaternion(-correction, node_->GetRight()) * rot;
+    float minCorrection{rot.EulerAngles().x_ - 80.0f};
+    if (minCorrection > 0.0f)
+        rot = Quaternion(-minCorrection, node_->GetRight()) * rot;
+    float maxCorrection{rot.EulerAngles().x_ + 80.0f};
+    if (maxCorrection < 0.0f)
+        rot = Quaternion(maxCorrection, node_->GetRight()) * rot;
 }

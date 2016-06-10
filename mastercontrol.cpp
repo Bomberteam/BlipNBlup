@@ -20,6 +20,7 @@
 #include "mastercontrol.h"
 #include "bnbcam.h"
 #include "fish.h"
+#include "bubble.h"
 #include "inputmaster.h"
 #include "castmaster.h"
 
@@ -29,8 +30,9 @@ MasterControl::MasterControl(Context *context):
     Application(context),
     paused_{false}
 {
-    Fish::RegisterObject(context_);
     BnBCam::RegisterObject(context_);
+    Fish::RegisterObject(context_);
+    Bubble::RegisterObject(context_);
 }
 
 void MasterControl::Setup()
@@ -111,6 +113,7 @@ void MasterControl::CreateScene()
     Skybox* skybox{skyNode->CreateComponent<Skybox>()};
     skybox->SetModel(CACHE->GetResource<Model>("Models/Box.mdl"));
     skybox->SetMaterial(CACHE->GetResource<Material>("Materials/Skybox.xml"));
+    skybox->GetMaterial()->SetShaderParameter("MatDiffColor", Color(0.5f, 0.6f, 1.0f));
 
     //Add ground
     Node* groundNode{scene_->CreateChild("Ground")};

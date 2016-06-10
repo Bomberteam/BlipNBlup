@@ -47,6 +47,7 @@ private:
     void HandleNodeCollision(StringHash eventType, VariantMap &eventData);
 
     void Blink();
+    void BlowBubble();
 };
 
 #endif // PLAYER_H

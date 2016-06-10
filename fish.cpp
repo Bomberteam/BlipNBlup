@@ -18,6 +18,7 @@
 */
 
 #include "fish.h"
+#include "bubble.h"
 
 Fish::Fish(Context *context) : Walker(context)
 {
@@ -63,10 +64,20 @@ void Fish::HandleAction(int actionId)
         break;
     case 1: Jump();
         break;
-    case 2: //Bubble();
+    case 2: BlowBubble();
         break;
     case 3:
         break;
     default: break;
     }
+}
+
+void Fish::BlowBubble()
+{
+    Node* bubbleNode{MC->GetScene()->CreateChild("Bubble")};
+    bubbleNode->SetPosition(node_->GetPosition());
+    bubbleNode->CreateComponent<Bubble>();
+    RigidBody* bubbleBody{bubbleNode->GetComponent<RigidBody>()};
+    bubbleBody->SetLinearVelocity(rigidBody_->GetLinearVelocity());
+    bubbleBody->ApplyImpulse(node_->GetDirection() * 2.3f);
 }

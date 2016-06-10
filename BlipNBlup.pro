@@ -24,7 +24,8 @@ SOURCES += \
     fish.cpp \
     controllable.cpp \
     walker.cpp \
-    castmaster.cpp
+    castmaster.cpp \
+    bubble.cpp
 
 HEADERS += \
     luckey.h \
@@ -34,4 +35,5 @@ HEADERS += \
     fish.h \
     controllable.h \
     walker.h \
-    castmaster.h
+    castmaster.h \
+    bubble.h
