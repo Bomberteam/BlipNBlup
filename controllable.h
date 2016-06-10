@@ -1,3 +1,22 @@
+/* Blip 'n Blup
+// Copyright (C) 2016 LucKey Productions (luckeyproductions.nl)
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// Commercial licenses are available through frode@lindeijer.nl
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
 #ifndef CONTROLLABLE_H
 #define CONTROLLABLE_H
 
@@ -11,6 +30,7 @@ class Controllable : public LogicComponent
     URHO3D_OBJECT(Controllable, LogicComponent);
 public:
     Controllable(Context* context);
+    virtual void OnNodeSet(Node* node);
     void SetActions(std::bitset<4> actions);
 protected:
     bool controlled_;
@@ -18,8 +38,20 @@ protected:
     Vector3 aim_;
     std::bitset<4> actions_;
 
+    StaticModel* model_;
+    RigidBody* rigidBody_;
+    CollisionShape* collider_;
+    AnimationController* animCtrl_;
+
+    float maxPitch_;
+    float minPitch_;
+
     void ResetInput() { move_ = aim_ = Vector3::ZERO; actions_.reset(); }
     virtual void HandleAction(int actionId);
+    void ClampPitch(Quaternion& rot);
+
+    void AlignWithVelocity(float timeStep);
+    void AlignWithMovement(float timeStep);
 };
 
 #endif // CONTROLLABLE_H

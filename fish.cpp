@@ -1,5 +1,5 @@
 /* Blip 'n Blup
-// Copyright (C) 2015 LucKey Productions (luckeyproductions.nl)
+// Copyright (C) 2016 LucKey Productions (luckeyproductions.nl)
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "fish.h"
 #include "bubble.h"
+#include "resourcemaster.h"
 
 Fish::Fish(Context *context) : Walker(context),
     bubbleInterval_{0.5f},
@@ -44,18 +45,18 @@ void Fish::OnNodeSet(Node *node)
 { (void)node;
     Walker::OnNodeSet(node);
 
-    model_->SetModel(CACHE->GetResource<Model>("Models/Blip.mdl"));
-    model_->SetMaterial(CACHE->GetResource<Material>("Materials/VCol.xml"));
+    model_->SetModel(RM->GetModel("Blip"));
+    model_->SetMaterial(RM->GetMaterial("VCol"));
 
-    rigidBody_->SetCollisionLayer(1 << 1);
-    rigidBody_->SetCollisionMask((1) + (1 << 1));
+    rigidBody_->SetCollisionLayer(LAYER(1));
+    rigidBody_->SetCollisionMask(M_MAX_UNSIGNED);
     rigidBody_->SetMass(2.0f);
     collider_->SetCapsule(0.8f, 1.0f);
 
 }
 void Fish::BecomeBlup()
 {
-    model_->SetModel(CACHE->GetResource<Model>("Models/Blup.mdl"));
+    model_->SetModel(RM->GetModel("Blup"));
     node_->Translate(Vector3::RIGHT);
 }
 void Fish::Update(float timeStep)

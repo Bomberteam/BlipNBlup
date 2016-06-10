@@ -17,26 +17,19 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef BUBBLE_H
-#define BUBBLE_H
+#ifndef RESOURCEMASTER_H
+#define RESOURCEMASTER_H
 
 #include <Urho3D/Urho3D.h>
 #include "luckey.h"
 
-class Bubble : public LogicComponent
+class ResourceMaster : public Object
 {
-    URHO3D_OBJECT(Bubble, LogicComponent);
+    URHO3D_OBJECT(ResourceMaster, Object);
 public:
-    Bubble(Context* context);
-    static void RegisterObject(Context* context);
-
-    virtual void OnNodeSet(Node* node);
-
-    void Update(float timeStep);
-private:
-    SharedPtr<StaticModel> model_;
-    SharedPtr<RigidBody> rigidBody_;
-    SharedPtr<CollisionShape> collider_;
+    ResourceMaster(Context* context);
+    Model*GetModel(String model);
+    Material*GetMaterial(String material);
 };
 
-#endif // BUBBLE_H
+#endif // RESOURCEMASTER_H

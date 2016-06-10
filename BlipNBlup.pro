@@ -26,7 +26,10 @@ SOURCES += \
     walker.cpp \
     castmaster.cpp \
     bubble.cpp \
-    wind.cpp
+    wind.cpp \
+    flyer.cpp \
+    wasp.cpp \
+    resourcemaster.cpp
 
 HEADERS += \
     luckey.h \
@@ -38,4 +41,7 @@ HEADERS += \
     walker.h \
     castmaster.h \
     bubble.h \
-    wind.h
+    wind.h \
+    flyer.h \
+    wasp.h \
+    resourcemaster.h

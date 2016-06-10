@@ -17,26 +17,30 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef BUBBLE_H
-#define BUBBLE_H
+#ifndef FLYER_H
+#define FLYER_H
 
 #include <Urho3D/Urho3D.h>
-#include "luckey.h"
+#include "controllable.h"
 
-class Bubble : public LogicComponent
+class Flyer : public Controllable
 {
-    URHO3D_OBJECT(Bubble, LogicComponent);
+    URHO3D_OBJECT(Flyer, Controllable);
 public:
-    Bubble(Context* context);
-    static void RegisterObject(Context* context);
-
+    Flyer(Context* context);
     virtual void OnNodeSet(Node* node);
+    virtual void Update(float timeStep);
 
-    void Update(float timeStep);
+protected:
+    float maxFlySpeed_;
+    float flyThrust_;
+
+    float chargeForce_;
+    float chargeInterval_;
+
+    float altitude_;
 private:
-    SharedPtr<StaticModel> model_;
-    SharedPtr<RigidBody> rigidBody_;
-    SharedPtr<CollisionShape> collider_;
+    void CorrectAltitude();
 };
 
-#endif // BUBBLE_H
+#endif // FLYER_H

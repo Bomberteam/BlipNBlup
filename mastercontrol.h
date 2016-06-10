@@ -1,5 +1,5 @@
 /* Blip 'n Blup
-// Copyright (C) 2015 LucKey Productions (luckeyproductions.nl)
+// Copyright (C) 2016 LucKey Productions (luckeyproductions.nl)
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 using namespace Urho3D;
 
+class ResourceMaster;
 class InputMaster;
 class BnBCam;
 class Fish;
@@ -56,6 +57,8 @@ namespace {
 StringHash const N_VOID = StringHash("Void");
 StringHash const N_CURSOR = StringHash("Cursor");
 }
+
+#define RM GetSubsystem<ResourceMaster>()
 
 class MasterControl : public Application
 {

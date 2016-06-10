@@ -96,6 +96,7 @@
 #define AUDIO GetSubsystem<Audio>()
 
 #define MC GetSubsystem<MasterControl>()
+#define LAYER(n) static_cast<unsigned>(1 << n)
 
 namespace Urho3D {
 class Drawable;

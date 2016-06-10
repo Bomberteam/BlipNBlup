@@ -17,26 +17,21 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef BUBBLE_H
-#define BUBBLE_H
+#ifndef WASP_H
+#define WASP_H
 
 #include <Urho3D/Urho3D.h>
-#include "luckey.h"
+#include "flyer.h"
 
-class Bubble : public LogicComponent
+class Wasp : public Flyer
 {
-    URHO3D_OBJECT(Bubble, LogicComponent);
+    URHO3D_OBJECT(Wasp, Flyer);
 public:
-    Bubble(Context* context);
+    Wasp(Context* context);
     static void RegisterObject(Context* context);
 
     virtual void OnNodeSet(Node* node);
-
-    void Update(float timeStep);
-private:
-    SharedPtr<StaticModel> model_;
-    SharedPtr<RigidBody> rigidBody_;
-    SharedPtr<CollisionShape> collider_;
+    virtual void Update(float timeStep);
 };
 
-#endif // BUBBLE_H
+#endif // WASP_H

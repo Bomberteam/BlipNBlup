@@ -1,3 +1,22 @@
+/* Blip 'n Blup
+// Copyright (C) 2016 LucKey Productions (luckeyproductions.nl)
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// Commercial licenses are available through frode@lindeijer.nl
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
 #include "walker.h"
 #include "castmaster.h"
 
@@ -12,13 +31,8 @@ Walker::Walker(Context* context) : Controllable(context),
 }
 
 void Walker::OnNodeSet(Node *node)
-{ (void)node;
-
-    model_ = node_->CreateComponent<StaticModel>();
-    rigidBody_ = node_->CreateComponent<RigidBody>();
-    collider_ = node_->CreateComponent<CollisionShape>();
-
-    model_->SetCastShadows(true);
+{
+    Controllable::OnNodeSet(node);
 
     rigidBody_->SetLinearRestThreshold(0.0f);
     rigidBody_->SetLinearDamping(0.5f);
@@ -45,11 +59,7 @@ void Walker::Update(float timeStep)
 
     //Apply movement
     if (move_.Length() > 0.0f){
-        Quaternion rot{node_->GetRotation()};
-        Quaternion targetRot{};
-        targetRot.FromLookRotation(move_);
-        rot = rot.Slerp(targetRot, Clamp(timeStep * 23.0f, 0.0f, 1.0f));
-        node_->SetRotation(rot);
+        AlignWithMovement(timeStep);
 
         rigidBody_->SetFriction(1.0f * onGround_);
         Vector3 force{runThrust_ * walkMultiplier * move_ * timeStep};
@@ -66,7 +76,7 @@ void Walker::Update(float timeStep)
     if (onGround_)
         AlignWithFloor(timeStep);
     else {
-        AlignWithMovement(timeStep);
+        AlignWithVelocity(timeStep);
     }
 }
 void Walker::HandleNodeCollisionStart(StringHash eventType, VariantMap& eventData)
@@ -102,6 +112,7 @@ void Walker::CheckOnGround(MemoryBuffer& contacts)
     }
 }
 
+
 void Walker::AlignWithFloor(float timeStep)
 {
     PODVector<PhysicsRaycastResult> hitResults{};
@@ -121,15 +132,7 @@ void Walker::AlignWithFloor(float timeStep)
             node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (3.0f + angleDelta), 0.0f, 1.0f)));
     }
 }
-void Walker::AlignWithMovement(float timeStep)
-{
-    Quaternion targetRot{};
-    Quaternion rot{node_->GetRotation()};
-    targetRot.FromLookRotation(rigidBody_->GetLinearVelocity()+node_->GetDirection()*0.1f);
-    ClampPitch(targetRot);
-    float horizontalVelocity{(rigidBody_->GetLinearVelocity() * Vector3(1.0f, 0.0f, 1.0f)).Length()};
-    node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (0.5f + 1.0f * horizontalVelocity), 0.0f, 1.0f)));
-}
+
 
 void Walker::Jump()
 {
@@ -150,12 +153,4 @@ void Walker::Jump()
     }
 }
 
-void Walker::ClampPitch(Quaternion& rot)
-{
-    float minCorrection{rot.EulerAngles().x_ - 80.0f};
-    if (minCorrection > 0.0f)
-        rot = Quaternion(-minCorrection, node_->GetRight()) * rot;
-    float maxCorrection{rot.EulerAngles().x_ + 80.0f};
-    if (maxCorrection < 0.0f)
-        rot = Quaternion(maxCorrection, node_->GetRight()) * rot;
-}
+

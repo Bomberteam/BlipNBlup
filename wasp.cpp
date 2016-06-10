@@ -17,37 +17,48 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "bubble.h"
-#include "wind.h"
+#include "wasp.h"
+#include "castmaster.h"
 #include "resourcemaster.h"
 
-Bubble::Bubble(Context* context) : LogicComponent(context)
+Wasp::Wasp(Context* context) : Flyer(context)
 {
+    maxFlySpeed_ = 13.0f;
+    flyThrust_ = 500.0f;
+
+    chargeForce_ = 5000.0f;
+    chargeInterval_ = 5.0f;
+
+    SetUpdateEventMask(USE_UPDATE);
 }
-void Bubble::RegisterObject(Context* context)
+
+void Wasp::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Bubble>();
+    context->RegisterFactory<Wasp>();
 }
 
-void Bubble::OnNodeSet(Node *node)
-{ (void)node;
+void Wasp::OnNodeSet(Node *node)
+{
 
-    model_ = node_->CreateComponent<StaticModel>();
-    model_->SetModel(RM->GetModel("Bubble"));
-    model_->SetMaterial(RM->GetMaterial("Bubble"));
+    Flyer::OnNodeSet(node);
 
-    rigidBody_ = node_->CreateComponent<RigidBody>();
-    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(2));
-    rigidBody_->SetMass(0.1f);
-    rigidBody_->SetLinearDamping(0.9f);
-    rigidBody_->SetGravityOverride(Vector3::UP * 9.0f);
+    node_->Translate(Quaternion(Random(360.0f), Vector3::UP) * Random(2.0f) * Vector3::FORWARD + Vector3::UP * 5.0f);
+    node_->Rotate(Quaternion(Random(360.0f), Vector3::UP));
 
-    collider_ = node_->CreateComponent<CollisionShape>();
+    model_->SetModel(RM->GetModel("Wasp"));
+    model_->SetMaterial(RM->GetMaterial("VCol"));
+
+    rigidBody_->SetCollisionLayer(LAYER(2));
+    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2));
+    rigidBody_->SetMass(2.0f);
     collider_->SetSphere(1.0f);
 
-    node_->CreateComponent<Wind>();
 }
-void Bubble::Update(float timeStep)
+
+void Wasp::Update(float timeStep)
 {
-    node_->Rotate(Quaternion(13.0f * timeStep, 23.0f * timeStep, 34.0f * timeStep));
+    Flyer::Update(timeStep);
+
+    move_ = Quaternion(5.0f, Vector3::UP) * node_->GetDirection();
 }
+

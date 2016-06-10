@@ -1,3 +1,22 @@
+/* Blip 'n Blup
+// Copyright (C) 2016 LucKey Productions (luckeyproductions.nl)
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// Commercial licenses are available through frode@lindeijer.nl
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
 #ifndef WALKER_H
 #define WALKER_H
 
@@ -13,31 +32,24 @@ public:
     virtual void Update(float timeStep);
 
 protected:
-    StaticModel* model_;
-    RigidBody* rigidBody_;
-    CollisionShape* collider_;
-    AnimationController* animCtrl_;
-
     float maxRunSpeed_;
     float runThrust_;
-
     float jumpForce_;
-    float jumpInterval_;
+
 
     bool onGround_;
     bool doubleJumper_;
     bool doubleJumped_;
-    bool jumpReleased_;
+    float jumpInterval_;
     float sinceJump_;
 
     void Jump();
+
     void HandleNodeCollisionStart(StringHash eventType, VariantMap& eventData);
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData);
 private:
-    void AlignWithFloor(float timeStep);
-    void AlignWithMovement(float timeStep);
-    void ClampPitch(Quaternion& rot);
     void CheckOnGround(MemoryBuffer& contacts);
+    void AlignWithFloor(float timeStep);
 };
 
 #endif // WALKER_H

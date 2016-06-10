@@ -1,5 +1,5 @@
 /* Blip 'n Blup
-// Copyright (C) 2015 LucKey Productions (luckeyproductions.nl)
+// Copyright (C) 2016 LucKey Productions (luckeyproductions.nl)
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 #include "fish.h"
 #include "bubble.h"
 #include "wind.h"
+#include "wasp.h"
+#include "resourcemaster.h"
 #include "inputmaster.h"
 #include "castmaster.h"
 
@@ -35,6 +37,8 @@ MasterControl::MasterControl(Context *context):
     Fish::RegisterObject(context_);
     Bubble::RegisterObject(context_);
     Wind::RegisterObject(context_);
+
+    Wasp::RegisterObject(context_);
 }
 
 void MasterControl::Setup()
@@ -42,10 +46,12 @@ void MasterControl::Setup()
     engineParameters_["WindowTitle"] = "Blip 'n Blup: Skyward Adventures";
     engineParameters_["LogName"] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs")+"blipnblup.log";
     engineParameters_["ResourcePaths"] = "Data;CoreData;Resources";
+    engineParameters_["WindowIcon"] = "icon.png";
 }
 void MasterControl::Start()
 {
     context_->RegisterSubsystem(this);
+    context_->RegisterSubsystem(new ResourceMaster(context_));
     context_->RegisterSubsystem(new InputMaster(context_));
     context_->RegisterSubsystem(new CastMaster(context_));
 
@@ -113,8 +119,8 @@ void MasterControl::CreateScene()
     //Add sky
     Node* skyNode{scene_->CreateChild("Sky")};
     Skybox* skybox{skyNode->CreateComponent<Skybox>()};
-    skybox->SetModel(CACHE->GetResource<Model>("Models/Box.mdl"));
-    skybox->SetMaterial(CACHE->GetResource<Material>("Materials/Skybox.xml"));
+    skybox->SetModel(RM->GetModel("Box"));
+    skybox->SetMaterial(RM->GetMaterial("Skybox"));
     skybox->GetMaterial()->SetShaderParameter("MatDiffColor", Color(0.5f, 0.6f, 1.0f));
 
     //Add ground
@@ -122,12 +128,12 @@ void MasterControl::CreateScene()
     groundNode->SetScale(1.0f);
     groundNode->Translate(Vector3(-1.0f, -0.5f, 0.0f));
     StaticModel* groundModel{groundNode->CreateComponent<StaticModel>()};
-    Model* phyisicalModel{CACHE->GetResource<Model>("Resources/Models/Level1_physical.mdl")};
+    Model* phyisicalModel{RM->GetModel("Level1_physical")};
     groundModel->SetModel(phyisicalModel);
-    groundModel->SetMaterial(CACHE->GetResource<Material>("Resources/Materials/VCol.xml"));
+    groundModel->SetMaterial(RM->GetMaterial("VCol"));
     groundModel->SetCastShadows(true);
     RigidBody* groundBody{groundNode->CreateComponent<RigidBody>()};
-    groundBody->SetCollisionLayer(1);
+    groundBody->SetCollisionLayer(LAYER(0));
     groundBody->SetFriction(0.8f);
     CollisionShape* groundCollider{groundNode->CreateComponent<CollisionShape>()};
     groundCollider->SetTriangleMesh(phyisicalModel);//SetBox(Vector3(23.0f, 2.0f, 23.0f), Vector3::DOWN);
@@ -153,6 +159,13 @@ void MasterControl::CreateScene()
     blup_ = blupNode->CreateComponent<Fish>();
     blup_->BecomeBlup();
     GetSubsystem<InputMaster>()->SetPlayerControl(2, blup_);
+
+    //Create wasps
+    for (int w{0}; w < 5; ++w) {
+        Node* waspNode{scene_->CreateChild("Wasp")};
+        waspNode->CreateComponent<Wasp>();
+    }
+
 
     //Create camera
     Node* camNode{scene_->CreateChild("Camera")};
