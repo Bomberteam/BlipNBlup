@@ -20,7 +20,9 @@
 #include "fish.h"
 #include "bubble.h"
 
-Fish::Fish(Context *context) : Walker(context)
+Fish::Fish(Context *context) : Walker(context),
+    bubbleInterval_{0.5f},
+    sinceBubble_{bubbleInterval_}
 {
     runThrust_ = 10000.0f;
     maxRunSpeed_ = 5.0f;
@@ -56,6 +58,12 @@ void Fish::BecomeBlup()
     model_->SetModel(CACHE->GetResource<Model>("Models/Blup.mdl"));
     node_->Translate(Vector3::RIGHT);
 }
+void Fish::Update(float timeStep)
+{
+    sinceBubble_ += timeStep;
+
+    Walker::Update(timeStep);
+}
 
 void Fish::HandleAction(int actionId)
 {
@@ -74,10 +82,14 @@ void Fish::HandleAction(int actionId)
 
 void Fish::BlowBubble()
 {
-    Node* bubbleNode{MC->GetScene()->CreateChild("Bubble")};
-    bubbleNode->SetPosition(node_->GetPosition());
-    bubbleNode->CreateComponent<Bubble>();
-    RigidBody* bubbleBody{bubbleNode->GetComponent<RigidBody>()};
-    bubbleBody->SetLinearVelocity(rigidBody_->GetLinearVelocity());
-    bubbleBody->ApplyImpulse(node_->GetDirection() * 2.3f);
+    if (sinceBubble_ > bubbleInterval_){
+        sinceBubble_ = 0.0f;
+
+        Node* bubbleNode{MC->GetScene()->CreateChild("Bubble")};
+        bubbleNode->SetPosition(node_->GetPosition());
+        bubbleNode->CreateComponent<Bubble>();
+        RigidBody* bubbleBody{bubbleNode->GetComponent<RigidBody>()};
+        bubbleBody->SetLinearVelocity(rigidBody_->GetLinearVelocity());
+        bubbleBody->ApplyImpulse(node_->GetDirection() * 2.3f);
+    }
 }

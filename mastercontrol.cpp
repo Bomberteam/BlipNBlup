@@ -21,6 +21,7 @@
 #include "bnbcam.h"
 #include "fish.h"
 #include "bubble.h"
+#include "wind.h"
 #include "inputmaster.h"
 #include "castmaster.h"
 
@@ -33,6 +34,7 @@ MasterControl::MasterControl(Context *context):
     BnBCam::RegisterObject(context_);
     Fish::RegisterObject(context_);
     Bubble::RegisterObject(context_);
+    Wind::RegisterObject(context_);
 }
 
 void MasterControl::Setup()

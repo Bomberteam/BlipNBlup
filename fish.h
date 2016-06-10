@@ -38,7 +38,12 @@ public:
 
     virtual void OnNodeSet(Node* node);
     void BecomeBlup();
+    virtual void Update(float timeStep);
+
 protected:
+    float bubbleInterval_;
+    float sinceBubble_;
+
     virtual void HandleAction(int actionId);
 private:
     float blink_;

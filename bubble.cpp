@@ -1,5 +1,5 @@
 #include "bubble.h"
-
+#include "wind.h"
 
 Bubble::Bubble(Context* context) : LogicComponent(context)
 {
@@ -24,6 +24,8 @@ void Bubble::OnNodeSet(Node *node)
 
     collider_ = node_->CreateComponent<CollisionShape>();
     collider_->SetSphere(1.0f);
+
+    node_->CreateComponent<Wind>();
 }
 void Bubble::Update(float timeStep)
 {
