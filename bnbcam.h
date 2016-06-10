@@ -37,21 +37,13 @@ public:
 
     Quaternion GetRotation() const { return node_->GetRotation(); }
     Camera* GetCamera() const { return camera_.Get(); }
-    virtual void DelayedStart();
+    void Update(float timeStep);
 private:
     SharedPtr<Camera> camera_;
     SharedPtr<Viewport> viewport_;
     SharedPtr<RenderPath> effectRenderPath_;
 
-    float yaw_;
-    float pitch_;
-    float roll_;
-    float yawDelta_;
-    float pitchDelta_;
-    float forceMultiplier;
-
     void SetupViewport();
-    void HandleSceneUpdate(StringHash eventType, VariantMap &eventData);
 };
 
 #endif // TEMPLATECAM_H

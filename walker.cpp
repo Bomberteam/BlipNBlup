@@ -20,6 +20,7 @@ void Walker::OnNodeSet(Node *node)
 
     model_->SetCastShadows(true);
 
+    rigidBody_->SetLinearRestThreshold(0.0f);
     rigidBody_->SetLinearDamping(0.5f);
     rigidBody_->SetRestitution(0.23f);
     rigidBody_->SetAngularDamping(1.0f);
@@ -127,7 +128,7 @@ void Walker::AlignWithMovement(float timeStep)
     targetRot.FromLookRotation(rigidBody_->GetLinearVelocity());
     ClampPitch(targetRot);
     float horizontalVelocity{(rigidBody_->GetLinearVelocity() * Vector3(1.0f, 0.0f, 1.0f)).Length()};
-    node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * 2.3f * horizontalVelocity, 0.0f, 1.0f)));
+    node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (0.1f + 1.3f * horizontalVelocity), 0.0f, 1.0f)));
 }
 
 void Walker::Jump()
@@ -151,7 +152,7 @@ void Walker::Jump()
 
 void Walker::ClampPitch(Quaternion& rot)
 {
-    float correction{rot.EulerAngles().x_ - 60.0f};
+    float correction{rot.EulerAngles().x_ - 70.0f};
     if (correction > 0.0f)
         rot = Quaternion(-correction, node_->GetRight()) * rot;
 }

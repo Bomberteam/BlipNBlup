@@ -133,10 +133,8 @@ Vector3 InputMaster::GetMoveFromActions(Vector<PlayerInputAction>* actions)
                  actions->Contains(PlayerInputAction::BACK))
                 };
 
-//    if (MC->camera_){
-//        Vector3 camRot{MC->camera_->GetRotation().EulerAngles()};
-//        move = Quaternion(camRot.y_, Vector3::UP) * move;
-//    }
+    Vector3 camRot{MC->GetCamera()->GetRotation().EulerAngles()};
+    move = Quaternion(camRot.y_, Vector3::UP) * move;
 
     return move;
 }

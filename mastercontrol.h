@@ -79,6 +79,7 @@ public:
 
 
     Scene* GetScene() { return scene_; }
+    BnBCam* GetCamera() { return camera_; }
 
     Fish* GetBlip() { return blip_.Get(); }
     Fish* GetBlup() { return blup_.Get(); }

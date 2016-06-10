@@ -153,20 +153,6 @@ void MasterControl::CreateScene()
     Node* camNode{scene_->CreateChild("Camera")};
     camera_ = camNode->CreateComponent<BnBCam>();
 
-    //Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    Viewport* viewport(new Viewport(context_, scene_, camera_->GetCamera()));
-
-    RenderPath* effectRenderPath{viewport->GetRenderPath()};
-    effectRenderPath->Append(CACHE->GetResource<XMLFile>("PostProcess/FXAA3.xml"));
-    effectRenderPath->SetEnabled("FXAA3", true);
-
-    effectRenderPath->Append(CACHE->GetResource<XMLFile>("PostProcess/BloomHDR.xml"));
-    effectRenderPath->SetShaderParameter("BloomHDRThreshold", 0.42f);
-    effectRenderPath->SetShaderParameter("BloomHDRMix", Vector2(0.9f, 0.23f));
-    effectRenderPath->SetEnabled("BloomHDR", true);
-
-    viewport->SetRenderPath(effectRenderPath);
-    RENDERER->SetViewport(0, viewport);
 }
 
 void MasterControl::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

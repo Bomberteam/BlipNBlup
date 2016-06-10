@@ -41,16 +41,30 @@ void BnBCam::OnNodeSet(Node *node)
     Zone* zone{node_->CreateComponent<Zone>()};
     zone->SetAmbientColor(Color(0.2f, 0.23f, 0.42f));
 
-
-}
-void BnBCam::DelayedStart()
-{
     SetupViewport();
 
 }
 
-
 void BnBCam::SetupViewport()
 {
 
+    //Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
+    Viewport* viewport(new Viewport(context_, MC->GetScene(), camera_));
+
+    RenderPath* effectRenderPath{viewport->GetRenderPath()};
+    effectRenderPath->Append(CACHE->GetResource<XMLFile>("PostProcess/FXAA3.xml"));
+    effectRenderPath->SetEnabled("FXAA3", true);
+
+    effectRenderPath->Append(CACHE->GetResource<XMLFile>("PostProcess/BloomHDR.xml"));
+    effectRenderPath->SetShaderParameter("BloomHDRThreshold", 0.42f);
+    effectRenderPath->SetShaderParameter("BloomHDRMix", Vector2(0.9f, 0.23f));
+    effectRenderPath->SetEnabled("BloomHDR", true);
+
+    viewport->SetRenderPath(effectRenderPath);
+    RENDERER->SetViewport(0, viewport);
+}
+
+void BnBCam::Update(float timeStep)
+{
+    node_->LookAt(MC->GetBlip()->GetNode()->GetPosition());
 }
