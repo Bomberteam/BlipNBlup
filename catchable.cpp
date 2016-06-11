@@ -24,7 +24,6 @@
 Catchable::Catchable(Context* context) : LogicComponent(context),
     caught_{false}
 {
-
 }
 
 void Catchable::RegisterObject(Context* context)
@@ -34,6 +33,7 @@ void Catchable::RegisterObject(Context* context)
 
 bool Catchable::Catch(Bubble* bubble)
 {
+
     if (!caught_){
         caught_ = true;
         if (node_->HasComponent<RigidBody>()){
@@ -42,11 +42,18 @@ bool Catchable::Catch(Bubble* bubble)
         node_->SetParent(bubble->GetNode());
         EM->TransformTo(node_, Vector3::ZERO, node_->GetRotation(), 0.23f);
         return true;
+
+        VariantMap eventData{};
+        node_->SendEvent(E_CATCH);
     }
     return false;
 }
 void Catchable::Release()
 {
-    node_->SetParent(MC->GetScene());
-    caught_ = false;
+
+    if (caught_){
+        node_->SetParent(MC->GetScene());
+        caught_ = false;
+        node_->SendEvent(E_RELEASE);
+    }
 }

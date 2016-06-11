@@ -24,7 +24,7 @@
 
 Flyer::Flyer(Context* context) : Controllable(context),
     altitude_{2.0f},
-    flyHeight_{3.4f}
+    flyHeight_{2.3f}
 {
 }
 
@@ -48,13 +48,20 @@ void Flyer::Update(float timeStep)
 
     //Hover
     rigidBody_->ApplyForce(Vector3::UP * flyThrust_ * 10.0f *
-                           (altitude_ - node_->GetPosition().y_ - rigidBody_->GetLinearVelocity().y_ * 0.1f) *
-                           MC->Sine(1.0f - 0.23f * randomizer_, 0.7f, 2.0f, randomizer_) * timeStep);
+                           pow(altitude_ - node_->GetPosition().y_ - rigidBody_->GetLinearVelocity().y_ * 0.1f, 0.5f) *
+                           MC->Sine(1.0f - 0.23f * randomizer_, 1.0f, 2.0f, randomizer_) * timeStep);
     //Fly
     if (rigidBody_->GetLinearVelocity().Length() < maxFlySpeed_
             || (rigidBody_->GetLinearVelocity().Normalized() + move_.Normalized()).Length() < 1.0f)
     {
-        rigidBody_->ApplyForce(move_ * flyThrust_ * timeStep);
+        Vector3 velocity{rigidBody_->GetLinearVelocity()};
+        Vector3 force{move_ * flyThrust_};
+        float remainingFlySpeed{maxFlySpeed_ - velocity.Length() * (1.0f-(velocity.Angle(force)/90.0f))};
+        float maxThrust = Max(flyThrust_ * remainingFlySpeed, 0.0f);
+        if (force.Length() > maxThrust)
+            force = force.Normalized() * maxThrust;
+
+        rigidBody_->ApplyForce(force * timeStep);
     }
     CorrectAltitude();
     AlignWithMovement(timeStep);

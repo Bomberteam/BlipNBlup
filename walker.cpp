@@ -39,7 +39,7 @@ void Walker::OnNodeSet(Node *node)
     rigidBody_->SetLinearDamping(0.5f);
     rigidBody_->SetRestitution(0.23f);
     rigidBody_->SetAngularDamping(1.0f);
-    rigidBody_->SetRollingFriction(0.5f);
+    rigidBody_->SetRollingFriction(0.0f);
     rigidBody_->SetAngularFactor(Vector3::UP);
     SubscribeToEvent(node_, E_NODECOLLISIONSTART, URHO3D_HANDLER(Walker, HandleNodeCollisionStart));
     SubscribeToEvent(node_, E_NODECOLLISION, URHO3D_HANDLER(Walker, HandleNodeCollision));
@@ -62,15 +62,21 @@ void Walker::Update(float timeStep)
     if (move_.Length() > 0.0f){
         AlignWithMovement(timeStep);
 
-        Vector3 velocity{rigidBody_->GetLinearVelocity()};
-
         rigidBody_->SetFriction(1.0f * onGround_);
-        Vector3 force{walkThrust * timeStep * move_};
+        Vector3 force{walkThrust * move_};
+        Vector3 planarVelocity{rigidBody_->GetLinearVelocity() * Vector3::ONE-Vector3::UP};
 
-        if (velocity.Length() < maxWalkSpeed
-         || (velocity.Normalized() + force.Normalized()).Length() < M_SQRT2)
+        if (planarVelocity.Length() <= maxWalkSpeed
+         || planarVelocity.DotProduct(force) < 0.0f)
         {
-            rigidBody_->ApplyForce(force); ///Needs extra limiter
+            float remainingSpeed{Clamp(
+                            maxWalkSpeed - planarVelocity.Length() * (1.0f-(planarVelocity.Angle(force)/90.0f)),
+                            0.0f, maxWalkSpeed)};
+            float maxThrust = Max(walkThrust * remainingSpeed, 0.0f);
+            if (force.Length() > maxThrust)
+                force = force.Normalized() * maxThrust;
+
+            rigidBody_->ApplyForce(force * timeStep);
         }
 
 

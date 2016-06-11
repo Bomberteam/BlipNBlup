@@ -38,4 +38,10 @@ private:
     bool caught_;
 };
 
+URHO3D_EVENT(E_CATCH, Catch)
+{
+    URHO3D_PARAM(P_NODE, Node);
+}
+URHO3D_EVENT(E_RELEASE, Release){}
+
 #endif // CATCHABLE_H

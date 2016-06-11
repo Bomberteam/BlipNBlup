@@ -51,20 +51,24 @@ private:
     HashMap<int, HashMap<int, PlayerInputAction>> keyBindingsPlayer_;
     HashMap<int, HashMap<int, PlayerInputAction>> buttonBindingsPlayer_;
 
-    HashMap<int, Controllable*> controlledByPlayer_;
-
     Vector<int> pressedKeys_;
-    Vector<LucKey::SixaxisButton> pressedJoystickButtons_;
+    HashMap<int, Vector<LucKey::SixaxisButton>> pressedJoystickButtons_;
+    HashMap<int, Vector2> leftStickPosition_;
+    HashMap<int, Vector2> rightStickPosition_;
+
+    HashMap<int, Controllable*> controlledByPlayer_;
 
     void HandleUpdate(StringHash eventType, VariantMap &eventData);
     void HandleKeyDown(StringHash eventType, VariantMap &eventData);
     void HandleKeyUp(StringHash eventType, VariantMap &eventData);
     void HandleJoyButtonDown(StringHash eventType, VariantMap &eventData);
     void HandleJoyButtonUp(StringHash eventType, VariantMap &eventData);
+    void HandleJoystickAxisMove(StringHash eventType, VariantMap& eventData);
 
     void HandleActions(const InputActions &actions);
     void HandlePlayerAction(PlayerInputAction action, CharacterID player = BLIP);
     Vector3 GetMoveFromActions(Vector<PlayerInputAction>* actions);
+    void CorrectForCameraYaw(Vector3& vec3);
 };
 
 #endif // INPUTMASTER_H

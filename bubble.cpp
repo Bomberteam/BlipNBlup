@@ -45,7 +45,7 @@ void Bubble::OnNodeSet(Node *node)
     rigidBody_ = node_->CreateComponent<RigidBody>();
     rigidBody_->SetCollisionLayer(LAYER(1));
     rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2));
-    rigidBody_->SetRollingFriction(0.2f);
+    rigidBody_->SetRollingFriction(0.42f);
     rigidBody_->SetLinearRestThreshold(0.0f);
     UpdateRigidBody();
 

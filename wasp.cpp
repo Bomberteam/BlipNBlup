@@ -42,6 +42,9 @@ void Wasp::OnNodeSet(Node *node)
 {   Flyer::OnNodeSet(node);
 
     node_->CreateComponent<Catchable>();
+    SubscribeToEvent(node_, E_CATCH, URHO3D_HANDLER(Wasp, Catched));
+    SubscribeToEvent(node_, E_RELEASE, URHO3D_HANDLER(Wasp, Released));
+
 
     node_->Translate(Quaternion(Random(360.0f), Vector3::UP) * Random(2.0f) * Vector3::FORWARD + Vector3::UP * Random(3.0f, 5.0f));
     node_->Rotate(Quaternion(Random(360.0f), Vector3::UP));
@@ -54,8 +57,9 @@ void Wasp::OnNodeSet(Node *node)
     rigidBody_->SetMass(2.0f);
     collider_->SetSphere(1.0f);
 
-    animCtrl_->PlayExclusive("Models/Wasp_Caught.ani", 0, true, 1.0f);
-    animCtrl_->SetStartBone("Models/Wasp_Caught.ani", "RootBone");
+    animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.0f);
+    animCtrl_->SetStartBone("Models/Wasp_Fly.ani", "RootBone");
+    animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 5.0f);
 }
 
 void Wasp::Update(float timeStep)
@@ -65,3 +69,19 @@ void Wasp::Update(float timeStep)
 //    model_->GetMaterial()->SetShaderParameter("MatEmissiveColor", Color::RED * MC->Sine(2.3f, 0.0f, 0.5f, randomizer_));
 }
 
+void Wasp::Catched(StringHash eventType, VariantMap& eventData)
+{ (void)eventType; (void)eventData;
+
+
+    animCtrl_->StopAll();
+    animCtrl_->PlayExclusive("Models/Wasp_Caught.ani", 1, true, 0.23f);
+    animCtrl_->SetStartBone("Models/Wasp_Caught.ani", "RootBone");
+
+}
+void Wasp::Released(StringHash eventType, VariantMap& eventData)
+{ (void)eventType; (void)eventData;
+
+    animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.0f);
+    animCtrl_->SetStartBone("Models/Wasp_Fly.ani", "RootBone");
+    animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 5.0f);
+}

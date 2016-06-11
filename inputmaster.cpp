@@ -25,30 +25,47 @@ using namespace LucKey;
 
 InputMaster::InputMaster(Context* context) : Object(context)
 {
-    keyBindingsMaster_[KEY_UP]     = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_UP)]    = MasterInputAction::UP;
-    keyBindingsMaster_[KEY_RIGHT]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_RIGHT)] = MasterInputAction::RIGHT;
-    keyBindingsMaster_[KEY_DOWN]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_DOWN)]  = MasterInputAction::DOWN;
-    keyBindingsMaster_[KEY_LEFT]   = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_DPAD_LEFT)]  = MasterInputAction::LEFT;
-    keyBindingsMaster_[KEY_RETURN] = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_CROSS)]      = MasterInputAction::CONFIRM;
-    keyBindingsMaster_[KEY_ESCAPE] = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_CIRCLE)]     = MasterInputAction::CANCEL;
-    keyBindingsMaster_[KEY_PAUSE]  = buttonBindingsMaster_[static_cast<int>(SixaxisButton::SB_START)]      = MasterInputAction::PAUSE;
+    keyBindingsMaster_[KEY_UP]     = buttonBindingsMaster_[static_cast<int>(SB_DPAD_UP)]    = MasterInputAction::UP;
+    keyBindingsMaster_[KEY_DOWN]   = buttonBindingsMaster_[static_cast<int>(SB_DPAD_DOWN)]  = MasterInputAction::DOWN;
+    keyBindingsMaster_[KEY_LEFT]   = buttonBindingsMaster_[static_cast<int>(SB_DPAD_LEFT)]  = MasterInputAction::LEFT;
+    keyBindingsMaster_[KEY_RIGHT]  = buttonBindingsMaster_[static_cast<int>(SB_DPAD_RIGHT)] = MasterInputAction::RIGHT;
+    keyBindingsMaster_[KEY_RETURN] = buttonBindingsMaster_[static_cast<int>(SB_CROSS)]      = MasterInputAction::CONFIRM;
+    keyBindingsMaster_[KEY_ESCAPE] = buttonBindingsMaster_[static_cast<int>(SB_CIRCLE)]     = MasterInputAction::CANCEL;
+    keyBindingsMaster_[KEY_PAUSE]  = buttonBindingsMaster_[static_cast<int>(SB_START)]      = MasterInputAction::PAUSE;
     keyBindingsMaster_[KEY_ESCAPE] = MasterInputAction::MENU;
 
     keyBindingsPlayer_[1][KEY_W] = keyBindingsPlayer_[1][KEY_UP]     = PlayerInputAction::FORWARD;
-    keyBindingsPlayer_[1][KEY_D] = keyBindingsPlayer_[1][KEY_RIGHT]  = PlayerInputAction::RIGHT;
     keyBindingsPlayer_[1][KEY_S] = keyBindingsPlayer_[1][KEY_DOWN]   = PlayerInputAction::BACK;
     keyBindingsPlayer_[1][KEY_A] = keyBindingsPlayer_[1][KEY_LEFT]   = PlayerInputAction::LEFT;
+    keyBindingsPlayer_[1][KEY_D] = keyBindingsPlayer_[1][KEY_RIGHT]  = PlayerInputAction::RIGHT;
     keyBindingsPlayer_[1][KEY_C] = keyBindingsPlayer_[1][KEY_LSHIFT] = PlayerInputAction::RUN;
     keyBindingsPlayer_[1][KEY_V] = keyBindingsPlayer_[1][KEY_ALT]    = PlayerInputAction::JUMP;
     keyBindingsPlayer_[1][KEY_B] = keyBindingsPlayer_[1][KEY_SPACE]  = PlayerInputAction::BUBBLE;
 
     keyBindingsPlayer_[2][KEY_KP_8]   = PlayerInputAction::FORWARD;
-    keyBindingsPlayer_[2][KEY_KP_6]   = PlayerInputAction::RIGHT;
     keyBindingsPlayer_[2][KEY_KP_5]   = PlayerInputAction::BACK;
+    keyBindingsPlayer_[2][KEY_KP_2]   = PlayerInputAction::BACK;
     keyBindingsPlayer_[2][KEY_KP_4]   = PlayerInputAction::LEFT;
+    keyBindingsPlayer_[2][KEY_KP_6]   = PlayerInputAction::RIGHT;
     keyBindingsPlayer_[2][KEY_RETURN] = PlayerInputAction::RUN;
     keyBindingsPlayer_[2][KEY_RSHIFT] = PlayerInputAction::JUMP;
     keyBindingsPlayer_[2][KEY_RCTRL]  = PlayerInputAction::BUBBLE;
+
+    buttonBindingsPlayer_[1][SB_DPAD_UP]    = PlayerInputAction::FORWARD;
+    buttonBindingsPlayer_[1][SB_DPAD_DOWN]  = PlayerInputAction::BACK;
+    buttonBindingsPlayer_[1][SB_DPAD_LEFT]  = PlayerInputAction::LEFT;
+    buttonBindingsPlayer_[1][SB_DPAD_RIGHT] = PlayerInputAction::RIGHT;
+    buttonBindingsPlayer_[1][SB_SQUARE]     = PlayerInputAction::RUN;
+    buttonBindingsPlayer_[1][SB_CROSS]      = PlayerInputAction::JUMP;
+    buttonBindingsPlayer_[1][SB_CIRCLE]     = PlayerInputAction::BUBBLE;
+
+    buttonBindingsPlayer_[2][SB_DPAD_UP]    = PlayerInputAction::FORWARD;
+    buttonBindingsPlayer_[2][SB_DPAD_DOWN]  = PlayerInputAction::BACK;
+    buttonBindingsPlayer_[2][SB_DPAD_LEFT]  = PlayerInputAction::LEFT;
+    buttonBindingsPlayer_[2][SB_DPAD_RIGHT] = PlayerInputAction::RIGHT;
+    buttonBindingsPlayer_[2][SB_SQUARE]     = PlayerInputAction::RUN;
+    buttonBindingsPlayer_[2][SB_CROSS]      = PlayerInputAction::JUMP;
+    buttonBindingsPlayer_[2][SB_CIRCLE]     = PlayerInputAction::BUBBLE;
 
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(InputMaster, HandleKeyDown));
     SubscribeToEvent(E_KEYUP, URHO3D_HANDLER(InputMaster, HandleKeyUp));
@@ -81,8 +98,18 @@ void InputMaster::HandleUpdate(StringHash eventType, VariantMap &eventData)
                 if (!activeActions.player_[p].Contains(action))
                     activeActions.player_[p].Push(action);
             }
-
     }
+    //Check for joystick button presses
+    for (int p : MC->GetPlayers()){
+
+        for (int button : pressedJoystickButtons_[p-1])
+            if (buttonBindingsPlayer_[p].Contains(button)){
+                PlayerInputAction action{ buttonBindingsPlayer_[p][button]};
+                if (!activeActions.player_[p].Contains(action))
+                    activeActions.player_[p].Push(action);
+            }
+    }
+
     //Handle the registered actions
     HandleActions(activeActions);
 }
@@ -97,8 +124,20 @@ void InputMaster::SetPlayerControl(int player, Controllable* controllable)
 void InputMaster::HandleActions(const InputActions& actions)
 {
     //Handle master actions
-    if (actions.master_.Contains(MasterInputAction::MENU))
-        MC->Exit();
+    for (MasterInputAction action : actions.master_){
+        switch (action){
+        case MasterInputAction::UP:                 break;
+        case MasterInputAction::DOWN:               break;
+        case MasterInputAction::LEFT:               break;
+        case MasterInputAction::RIGHT:              break;
+        case MasterInputAction::CONFIRM:            break;
+        case MasterInputAction::CANCEL:             break;
+        case MasterInputAction::PAUSE:              break;
+        case MasterInputAction::MENU: MC->Exit();   break;
+        default: break;
+        }
+    }
+
 
     //Handle player actions
     for (int p : MC->GetPlayers()){
@@ -118,6 +157,7 @@ void InputMaster::HandleActions(const InputActions& actions)
         }
     }
 }
+
 Vector3 InputMaster::GetMoveFromActions(Vector<PlayerInputAction>* actions)
 {
     Vector3 move{Vector3::RIGHT *
@@ -133,8 +173,7 @@ Vector3 InputMaster::GetMoveFromActions(Vector<PlayerInputAction>* actions)
                  actions->Contains(PlayerInputAction::BACK))
                 };
 
-    Vector3 camRot{MC->GetCamera()->GetRotation().EulerAngles()};
-    move = Quaternion(camRot.y_, Vector3::UP) * move;
+    CorrectForCameraYaw(move);
 
     return move;
 }
@@ -168,7 +207,8 @@ void InputMaster::HandleKeyDown(StringHash eventType, VariantMap &eventData)
 void InputMaster::HandleKeyUp(StringHash eventType, VariantMap &eventData)
 { (void)eventType;
 
-    int key{eventData[KeyUp::P_KEY].GetInt()};
+    int key{ eventData[KeyUp::P_KEY].GetInt() };
+
     if (pressedKeys_.Contains(key))
         pressedKeys_.Remove(key);
 }
@@ -176,15 +216,41 @@ void InputMaster::HandleKeyUp(StringHash eventType, VariantMap &eventData)
 void InputMaster::HandleJoyButtonDown(StringHash eventType, VariantMap &eventData)
 { (void)eventType;
 
-    SixaxisButton button{static_cast<SixaxisButton>(eventData[JoystickButtonDown::P_BUTTON].GetInt())};
-    if (!pressedJoystickButtons_.Contains(button))
-        pressedJoystickButtons_.Push(button);
+    int joystickId{ eventData[JoystickButtonDown::P_JOYSTICKID].GetInt() };
+    SixaxisButton button{ static_cast<SixaxisButton>(eventData[JoystickButtonDown::P_BUTTON].GetInt()) };
+
+    if (!pressedJoystickButtons_[joystickId].Contains(button))
+        pressedJoystickButtons_[joystickId].Push(button);
 }
 void InputMaster::HandleJoyButtonUp(StringHash eventType, VariantMap &eventData)
 { (void)eventType;
 
-    SixaxisButton button{static_cast<SixaxisButton>(eventData[JoystickButtonUp::P_BUTTON].GetInt())};
-    if (pressedJoystickButtons_.Contains(button))
-        pressedJoystickButtons_.Remove(button);
+    int joystickId{ eventData[JoystickButtonDown::P_JOYSTICKID].GetInt() };
+    SixaxisButton button{ static_cast<SixaxisButton>(eventData[JoystickButtonUp::P_BUTTON].GetInt()) };
+
+    if (pressedJoystickButtons_[joystickId].Contains(button))
+        pressedJoystickButtons_[joystickId].Remove(button);
+}
+void InputMaster::HandleJoystickAxisMove(StringHash eventType, VariantMap& eventData)
+{ (void)eventType;
+
+    int joystickId{ eventData[JoystickAxisMove::P_JOYSTICKID].GetInt() };
+    int axis{ eventData[JoystickAxisMove::P_AXIS].GetInt() };
+    float position{ eventData[JoystickAxisMove::P_POSITION].GetFloat() };
+
+    if (axis == 0){
+        leftStickPosition_[joystickId].x_ = position;
+    } else if (axis == 1) {
+        leftStickPosition_[joystickId].y_ = position;
+    } else if (axis == 2) {
+        rightStickPosition_[joystickId].x_ = position;
+    } else if (axis == 3) {
+        rightStickPosition_[joystickId].y_ = position;
+    }
 }
 
+void InputMaster::CorrectForCameraYaw(Vector3& vec3)
+{
+    Vector3 camRot{MC->GetCamera()->GetRotation().EulerAngles()};
+    vec3 = Quaternion(camRot.y_, Vector3::UP) * vec3;
+}

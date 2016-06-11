@@ -53,6 +53,7 @@ void MasterControl::Setup()
 }
 void MasterControl::Start()
 {
+    ENGINE->SetMaxFps(100);
     SetRandomSeed(TIME->GetSystemTime());
 
     context_->RegisterSubsystem(this);
