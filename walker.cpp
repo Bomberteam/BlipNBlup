@@ -70,7 +70,7 @@ void Walker::Update(float timeStep)
         if (velocity.Length() < maxWalkSpeed
          || (velocity.Normalized() + force.Normalized()).Length() < M_SQRT2)
         {
-            rigidBody_->ApplyForce(force);
+            rigidBody_->ApplyForce(force); ///Needs extra limiter
         }
 
 
@@ -106,7 +106,8 @@ void Walker::CheckOnGround(MemoryBuffer& contacts)
         /*float contactDistance = */contacts.ReadFloat();
         /*float contactImpulse = */contacts.ReadFloat();
 
-        if ((node_->GetPosition().y_ - contactPosition.y_) > collider_->GetSize().x_/2.0f && sinceJump_ > jumpInterval_){
+        if ((node_->GetPosition().y_ - contactPosition.y_) > collider_->GetSize().x_/2.0f
+         && sinceJump_ > jumpInterval_){
 
             onGround_ = true;
             doubleJumped_ = false;

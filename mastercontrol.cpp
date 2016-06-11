@@ -27,6 +27,7 @@
 #include "resourcemaster.h"
 #include "inputmaster.h"
 #include "castmaster.h"
+#include "effectmaster.h"
 
 URHO3D_DEFINE_APPLICATION_MAIN(MasterControl);
 
@@ -58,6 +59,7 @@ void MasterControl::Start()
     context_->RegisterSubsystem(new ResourceMaster(context_));
     context_->RegisterSubsystem(new InputMaster(context_));
     context_->RegisterSubsystem(new CastMaster(context_));
+    context_->RegisterSubsystem(new EffectMaster(context_));
 
     INPUT->SetMouseMode(MM_FREE);
 
@@ -118,7 +120,7 @@ void MasterControl::CreateScene()
     scene_->CreateComponent<DebugRenderer>();
 
     scene_->CreateComponent<PhysicsWorld>();
-    scene_->GetComponent<PhysicsWorld>()->SetGravity(GRAVITY);
+    scene_->GetComponent<PhysicsWorld>()->SetGravity(Vector3::DOWN * 42.0f);
 
     //Add sky
     Node* skyNode{scene_->CreateChild("Sky")};
@@ -149,9 +151,10 @@ void MasterControl::CreateScene()
     Light* light{lightNode->CreateComponent<Light>()};
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetBrightness(0.9f);
+    light->SetShadowIntensity(0.3f);
     light->SetColor(Color(0.8f, 0.95f, 0.9f));
     light->SetCastShadows(true);
-    light->SetShadowBias(BiasParameters(0.000125f, 0.5f));
+    light->SetShadowBias(BiasParameters(0.000023f, 0.5f));
     light->SetShadowCascade(CascadeParameters(7.0f, 23.0f, 42.0f, 500.0f, 0.8f));
 
     //Create fish

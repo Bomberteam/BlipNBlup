@@ -47,6 +47,7 @@ private:
     SharedPtr<CollisionShape> collider_;
 
     Catchable* catchable_;
+    void UpdateRigidBody(float otherMass = 0.0f);
 };
 
 #endif // BUBBLE_H

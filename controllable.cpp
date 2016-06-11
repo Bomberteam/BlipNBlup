@@ -32,9 +32,10 @@ Controllable::Controllable(Context* context) : LogicComponent(context),
 void Controllable::OnNodeSet(Node *node)
 { (void)node;
 
-    model_ = node_->CreateComponent<StaticModel>();
+    model_ = node_->CreateComponent<AnimatedModel>();
     rigidBody_ = node_->CreateComponent<RigidBody>();
     collider_ = node_->CreateComponent<CollisionShape>();
+    animCtrl_ = node_->CreateComponent<AnimationController>();
 
     model_->SetCastShadows(true);
 }
@@ -71,7 +72,7 @@ void Controllable::AlignWithVelocity(float timeStep)
     targetRot.FromLookRotation(rigidBody_->GetLinearVelocity());
     ClampPitch(targetRot);
     float horizontalVelocity{(rigidBody_->GetLinearVelocity() * Vector3(1.0f, 0.0f, 1.0f)).Length()};
-    node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * (0.5f + 1.0f * horizontalVelocity), 0.0f, 1.0f)));
+    node_->SetRotation(rot.Slerp(targetRot, Clamp(timeStep * horizontalVelocity, 0.0f, 1.0f)));
 }
 
 void Controllable::ClampPitch(Quaternion& rot)

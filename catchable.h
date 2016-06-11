@@ -31,11 +31,11 @@ class Catchable : public LogicComponent
 public:
     Catchable(Context* context);
     static void RegisterObject(Context *context);
-    bool IsCatched() const { return catched_; }
+    bool IsCaught() const { return caught_; }
     bool Catch(Bubble* bubble);
     void Release();
 private:
-    bool catched_;
+    bool caught_;
 };
 
 #endif // CATCHABLE_H

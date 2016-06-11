@@ -54,6 +54,8 @@ void Wasp::OnNodeSet(Node *node)
     rigidBody_->SetMass(2.0f);
     collider_->SetSphere(1.0f);
 
+    animCtrl_->PlayExclusive("Models/Wasp_Caught.ani", 0, true, 1.0f);
+    animCtrl_->SetStartBone("Models/Wasp_Caught.ani", "RootBone");
 }
 
 void Wasp::Update(float timeStep)

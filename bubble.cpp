@@ -21,6 +21,7 @@
 #include "wind.h"
 #include "catchable.h"
 #include "resourcemaster.h"
+#include "effectmaster.h"
 
 Bubble::Bubble(Context* context) : LogicComponent(context),
     empty_{true}
@@ -34,6 +35,8 @@ void Bubble::RegisterObject(Context* context)
 void Bubble::OnNodeSet(Node *node)
 { (void)node;
 
+    node_->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
+
     model_ = node_->CreateComponent<StaticModel>();
     model_->SetModel(RM->GetModel("Bubble"));
     model_->SetMaterial(RM->GetMaterial("Bubble"));
@@ -42,11 +45,9 @@ void Bubble::OnNodeSet(Node *node)
     rigidBody_ = node_->CreateComponent<RigidBody>();
     rigidBody_->SetCollisionLayer(LAYER(1));
     rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2));
-    rigidBody_->SetMass(BUBBLE_WEIGHT);
-    rigidBody_->SetLinearDamping(0.9f);
     rigidBody_->SetRollingFriction(0.2f);
     rigidBody_->SetLinearRestThreshold(0.0f);
-    rigidBody_->SetGravityOverride(Vector3::UP * 9.0f);
+    UpdateRigidBody();
 
     collider_ = node_->CreateComponent<CollisionShape>();
     collider_->SetSphere(1.0f);
@@ -57,10 +58,34 @@ void Bubble::OnNodeSet(Node *node)
 }
 void Bubble::Update(float timeStep)
 {
-    if (!empty_)
-        return;
+    if (!empty_){
+//        rigidBody_->ApplyForce((catchable_->GetNode()->GetWorldPosition() - node_->GetPosition()) * timeStep * 4200.0f * rigidBody_->GetMass());
+    } else {
+        rigidBody_->ApplyTorque(Vector3(13.0f * timeStep, 23.0f * timeStep, 34.0f * timeStep));
+    }
+}
 
-    node_->Rotate(Quaternion(13.0f * timeStep, 23.0f * timeStep, 34.0f * timeStep));
+void Bubble::UpdateRigidBody(float otherMass)
+{
+    if (otherMass == 0.0f){
+        rigidBody_->SetMass(BUBBLE_WEIGHT);
+        rigidBody_->SetLinearDamping(0.9f);
+        rigidBody_->SetAngularDamping(0.1f);
+        rigidBody_->SetGravityOverride(Vector3::UP * 9.0f);
+        rigidBody_->ResetForces();
+        rigidBody_->SetAngularVelocity(Vector3::ZERO);
+        rigidBody_->SetLinearVelocity(Vector3::ZERO);
+        rigidBody_->ReAddBodyToWorld();
+    } else {
+        rigidBody_->SetMass(Max(0.5f * otherMass - BUBBLE_WEIGHT, BUBBLE_WEIGHT));
+        rigidBody_->SetLinearDamping(0.8f);
+        rigidBody_->SetAngularDamping(0.2f);
+        rigidBody_->SetGravityOverride(Vector3::ZERO);
+        rigidBody_->ResetForces();
+        rigidBody_->SetAngularVelocity(Vector3::ZERO);
+        rigidBody_->SetLinearVelocity(Vector3::ZERO);
+        rigidBody_->ReAddBodyToWorld();
+    }
 }
 
 void Bubble::HandleNodeCollisionStart(StringHash eventType, VariantMap& eventData)
@@ -76,19 +101,17 @@ void Bubble::HandleNodeCollisionStart(StringHash eventType, VariantMap& eventDat
     float contactImpulse{contacts.ReadFloat()};
 
     //Catch the catchable
-    if (empty_ && contactImpulse > 1.0f && otherNode->HasComponent<Catchable>()) {
+    if (empty_ && contactImpulse > 0.5f && otherNode->HasComponent<Catchable>()) {
 
         float otherMass{otherBody->GetMass()};
         Catchable* catchable{otherNode->GetComponent<Catchable>()};
         if (catchable->Catch(this)){
             empty_ = false;
             catchable_ = catchable;
-            rigidBody_->SetMass(otherMass);
-            rigidBody_->SetGravityOverride(Vector3::ZERO);
-            rigidBody_->SetLinearDamping(0.8f);
-            rigidBody_->SetAngularDamping(0.2f);
-            rigidBody_->ReAddBodyToWorld();
-            rigidBody_->ResetForces();
+            UpdateRigidBody(otherMass);
+            EM->TransformTo(node_,
+                            0.5f * (node_->GetPosition() + catchable->GetNode()->GetWorldPosition()),
+                            node_->GetRotation(), 0.1f);
             return;
         }
     }

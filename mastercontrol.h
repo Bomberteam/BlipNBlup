@@ -27,6 +27,7 @@
 using namespace Urho3D;
 
 class ResourceMaster;
+class EffectMaster;
 class InputMaster;
 class BnBCam;
 class Fish;
@@ -58,8 +59,8 @@ StringHash const N_VOID = StringHash("Void");
 StringHash const N_CURSOR = StringHash("Cursor");
 }
 
-#define GRAVITY Vector3::DOWN * 42.0f
 #define RM GetSubsystem<ResourceMaster>()
+#define EM GetSubsystem<EffectMaster>()
 
 class MasterControl : public Application
 {

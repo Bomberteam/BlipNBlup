@@ -38,7 +38,7 @@ protected:
     Vector3 aim_;
     std::bitset<4> actions_;
 
-    StaticModel* model_;
+    AnimatedModel* model_;
     RigidBody* rigidBody_;
     CollisionShape* collider_;
     AnimationController* animCtrl_;

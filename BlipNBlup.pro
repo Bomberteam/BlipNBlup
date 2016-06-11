@@ -30,6 +30,7 @@ SOURCES += \
     flyer.cpp \
     wasp.cpp \
     resourcemaster.cpp \
+    effectmaster.cpp \
     catchable.cpp
 
 HEADERS += \
@@ -46,4 +47,5 @@ HEADERS += \
     flyer.h \
     wasp.h \
     resourcemaster.h \
+    effectmaster.h \
     catchable.h

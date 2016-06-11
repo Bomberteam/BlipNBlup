@@ -23,7 +23,8 @@
 
 
 Flyer::Flyer(Context* context) : Controllable(context),
-    altitude_{2.0f}
+    altitude_{2.0f},
+    flyHeight_{3.4f}
 {
 }
 
@@ -42,7 +43,7 @@ void Flyer::OnNodeSet(Node* node)
 void Flyer::Update(float timeStep)
 {
     if (node_->HasComponent<Catchable>()
-     && node_->GetComponent<Catchable>()->IsCatched())
+     && node_->GetComponent<Catchable>()->IsCaught())
         return;
 
     //Hover
@@ -68,5 +69,5 @@ void Flyer::CorrectAltitude()
     GetSubsystem<CastMaster>()->PhysicsRayCast(results, floorRay, 1024.0f, LAYER(0));
 
     if (results.Size())
-        altitude_ = results[0].position_.y_ + 2.3f;
+        altitude_ = results[0].position_.y_ + flyHeight_;
 }

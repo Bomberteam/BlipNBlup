@@ -34,6 +34,7 @@ public:
 protected:
     float maxFlySpeed_;
     float flyThrust_;
+    float flyHeight_;
 
     float chargeForce_;
     float chargeInterval_;
