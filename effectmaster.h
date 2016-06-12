@@ -40,9 +40,11 @@ public:
 
     void TranslateTo(Node* node, Vector3 pos, float duration);
     void RotateTo(Node* node, Quaternion rot, float duration);
-    void TransformTo(Node* node, Vector3 pos, Quaternion rot = Quaternion::IDENTITY, float duration = 1.0f);
+    void ScaleTo(Node* node, Vector3 scale, float duration);
+    void ScaleTo(Node* node, float scale, float duration) { ScaleTo(node, Vector3::ONE * scale, duration); }
+    void TransformTo(Node* node, Vector3 pos, Quaternion rot, float duration);
 
-    void ArchTo(Node* node, Vector3 pos, Quaternion rot, float archHeight = 2.3f, float duration = 1.0f, float delay = 0.0f);
+    void ArchTo(Node* node, Vector3 pos, Quaternion rot, float archHeight, float duration, float delay = 0.0f);
     float Arch(float t) const noexcept { return 1.0f - pow(2.0f * (t-0.5f), 4.0f); }
 };
 

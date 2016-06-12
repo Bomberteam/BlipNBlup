@@ -39,7 +39,7 @@ void BnBCam::OnNodeSet(Node *node)
     node_->SetRotation(Quaternion(23.0f, 0.0f, 0.0f));
 
     Zone* zone{node_->CreateComponent<Zone>()};
-    zone->SetAmbientColor(Color(0.2f, 0.23f, 0.42f));
+    zone->SetAmbientColor(Color(0.13f, 0.23f, 0.42f));
 
     SetupViewport();
 

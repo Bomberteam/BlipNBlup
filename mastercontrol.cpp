@@ -23,6 +23,7 @@
 #include "bubble.h"
 #include "wind.h"
 #include "catchable.h"
+#include "rage.h"
 #include "wasp.h"
 #include "resourcemaster.h"
 #include "inputmaster.h"
@@ -41,6 +42,7 @@ MasterControl::MasterControl(Context *context):
     Wind::RegisterObject(context_);
 
     Catchable::RegisterObject(context_);
+    Rage::RegisterObject(context_);
     Wasp::RegisterObject(context_);
 }
 
@@ -153,7 +155,7 @@ void MasterControl::CreateScene()
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetBrightness(0.9f);
     light->SetShadowIntensity(0.3f);
-    light->SetColor(Color(0.8f, 0.95f, 0.9f));
+    light->SetColor(Color(0.95f, 0.9f, 0.85f));
     light->SetCastShadows(true);
     light->SetShadowBias(BiasParameters(0.000023f, 0.5f));
     light->SetShadowCascade(CascadeParameters(7.0f, 23.0f, 42.0f, 500.0f, 0.8f));
@@ -169,11 +171,10 @@ void MasterControl::CreateScene()
     GetSubsystem<InputMaster>()->SetPlayerControl(2, blup_);
 
     //Create wasps
-    for (int w{0}; w < 23; ++w) {
+    for (int w{0}; w < 10; ++w) {
         Node* waspNode{scene_->CreateChild("Wasp")};
         waspNode->CreateComponent<Wasp>();
     }
-
 
     //Create camera
     Node* camNode{scene_->CreateChild("Camera")};

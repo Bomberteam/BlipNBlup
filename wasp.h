@@ -23,6 +23,8 @@
 #include <Urho3D/Urho3D.h>
 #include "flyer.h"
 
+class Rage;
+
 class Wasp : public Flyer
 {
     URHO3D_OBJECT(Wasp, Flyer);
@@ -33,6 +35,8 @@ public:
     virtual void OnNodeSet(Node* node);
     virtual void Update(float timeStep);
 private:
+    Rage* rage_;
+
     void OnReleased(StringHash eventType, VariantMap& eventData);
     void OnCatched(StringHash eventType, VariantMap& eventData);
 };

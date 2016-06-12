@@ -23,6 +23,9 @@
 #include <Urho3D/Urho3D.h>
 #include "luckey.h"
 
+URHO3D_EVENT(E_CATCH, Catch){}
+URHO3D_EVENT(E_RELEASE, Release){}
+
 class Container;
 
 class Catchable : public LogicComponent

@@ -19,6 +19,7 @@
 
 #include "wasp.h"
 #include "catchable.h"
+#include "rage.h"
 #include "castmaster.h"
 #include "resourcemaster.h"
 
@@ -42,11 +43,14 @@ void Wasp::OnNodeSet(Node *node)
 {   Flyer::OnNodeSet(node);
 
     Catchable*  catchable{node_->CreateComponent<Catchable>()};
+    rage_ = node_->CreateComponent<Rage>();
+    rage_->SetCooldown(10.0f);
+
     catchable->SetReleaseTime(23.0f);
     SubscribeToEvent(node_, E_CATCH, URHO3D_HANDLER(Wasp, OnCatched));
     SubscribeToEvent(node_, E_RELEASE, URHO3D_HANDLER(Wasp, OnReleased));
 
-    node_->Translate(Quaternion(Random(360.0f), Vector3::UP) * Random(2.0f) * Vector3::FORWARD + Vector3::UP * Random(3.0f, 5.0f));
+    node_->Translate(Quaternion(Random(360.0f), Vector3::UP) * Random(0.5f, 4.2f) * Vector3::FORWARD + Vector3::UP * Random(5.0f, 7.0f));
     node_->Rotate(Quaternion(Random(360.0f), Vector3::UP));
 
     model_->SetModel(RM->GetModel("Wasp"));
@@ -64,10 +68,13 @@ void Wasp::OnNodeSet(Node *node)
 
 void Wasp::Update(float timeStep)
 {
-    move_ = Quaternion(5.0f, Vector3::UP) * node_->GetDirection();
+    move_ = Quaternion(5.0f + 3.0f * rage_->GetAnger(), Vector3::UP) * node_->GetDirection(); ///Should be handled by AI component
+
     Flyer::Update(timeStep);
     animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 1.0f + rigidBody_->GetLinearVelocity().Length());
-//    model_->GetMaterial()->SetShaderParameter("MatEmissiveColor", Color::RED * MC->Sine(2.3f, 0.0f, 0.5f, randomizer_));
+
+    model_->GetMaterial()->SetShaderParameter("MatEmissiveColor", Color::RED * MC->Sine(2.3f, 0.0f, 0.5f * rage_->GetAnger(), randomizer_));
+    maxFlySpeed_ = 13.0f + 7.0f * rage_->GetAnger();
 }
 
 void Wasp::OnCatched(StringHash eventType, VariantMap& eventData)
@@ -80,6 +87,9 @@ void Wasp::OnCatched(StringHash eventType, VariantMap& eventData)
 void Wasp::OnReleased(StringHash eventType, VariantMap& eventData)
 { (void)eventType; (void)eventData;
 
+    rage_->FillAnger();
+
+    node_->GetComponent<Rage>()->FillAnger();
     animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.0f);
     animCtrl_->SetStartBone("Models/Wasp_Fly.ani", "RootBone");
     animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 5.0f);

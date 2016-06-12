@@ -84,6 +84,13 @@ void EffectMaster::RotateTo(Node* node, Quaternion rot, float duration)
     rotAnim->SetKeyFrame(duration, rot);
     node->SetAttributeAnimation("Rotation", rotAnim, WM_ONCE);
 }
+void EffectMaster::ScaleTo(Node* node, Vector3 scale, float duration)
+{
+    ValueAnimation* scaleAnim{new ValueAnimation(context_)};
+    scaleAnim->SetKeyFrame(0.0f, node->GetScale());
+    scaleAnim->SetKeyFrame(duration, scale);
+    node->SetAttributeAnimation("Scale", scaleAnim, WM_ONCE);
+}
 
 void EffectMaster::ArchTo(Node* node, Vector3 pos, Quaternion rot, float archHeight, float duration, float delay)
 {

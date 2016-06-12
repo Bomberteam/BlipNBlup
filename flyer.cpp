@@ -24,7 +24,7 @@
 
 Flyer::Flyer(Context* context) : Controllable(context),
     altitude_{2.0f},
-    flyHeight_{2.3f}
+    flyHeight_{2.3f + randomizer_}
 {
 }
 

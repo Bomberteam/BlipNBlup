@@ -34,8 +34,11 @@ void Bubble::RegisterObject(Context* context)
 void Bubble::OnNodeSet(Node *node)
 {
     Container::OnNodeSet(node);
+    node_->CreateComponent<Wind>();
 
     node_->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
+    node_->SetScale(0.8f);
+    FX->ScaleTo(node_, 1.0f, 0.05f);
 
     model_->SetModel(RM->GetModel("Bubble"));
     model_->SetMaterial(RM->GetMaterial("Bubble"));
@@ -49,7 +52,6 @@ void Bubble::OnNodeSet(Node *node)
 
     collider_->SetSphere(1.0f);
 
-    node_->CreateComponent<Wind>();
 
     SubscribeToEvent(node_, E_NODECOLLISIONSTART, URHO3D_HANDLER(Bubble, HandleNodeCollisionStart));
 }

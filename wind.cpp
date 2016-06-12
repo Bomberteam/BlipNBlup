@@ -31,7 +31,7 @@ void Wind::RegisterObject(Context *context)
 
 void Wind::Update(float timeStep)
 {
-    if (node_->HasComponent<Bubble>() && !node_->GetComponent<Bubble>()->IsEmpty())
+    if (node_->HasComponent<Container>() && !node_->GetComponent<Container>()->IsEmpty())
         return;
 
     RigidBody* rigidBody{node_->GetComponent<RigidBody>()};
