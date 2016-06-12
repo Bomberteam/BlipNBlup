@@ -23,8 +23,7 @@
 #include "resourcemaster.h"
 #include "effectmaster.h"
 
-Bubble::Bubble(Context* context) : LogicComponent(context),
-    empty_{true}
+Bubble::Bubble(Context* context) : Container(context)
 {
 }
 void Bubble::RegisterObject(Context* context)
@@ -33,23 +32,21 @@ void Bubble::RegisterObject(Context* context)
 }
 
 void Bubble::OnNodeSet(Node *node)
-{ (void)node;
+{
+    Container::OnNodeSet(node);
 
     node_->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
 
-    model_ = node_->CreateComponent<StaticModel>();
     model_->SetModel(RM->GetModel("Bubble"));
     model_->SetMaterial(RM->GetMaterial("Bubble"));
     model_->SetCastShadows(true);
 
-    rigidBody_ = node_->CreateComponent<RigidBody>();
     rigidBody_->SetCollisionLayer(LAYER(1));
     rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2));
     rigidBody_->SetRollingFriction(0.42f);
     rigidBody_->SetLinearRestThreshold(0.0f);
     UpdateRigidBody();
 
-    collider_ = node_->CreateComponent<CollisionShape>();
     collider_->SetSphere(1.0f);
 
     node_->CreateComponent<Wind>();
@@ -58,8 +55,10 @@ void Bubble::OnNodeSet(Node *node)
 }
 void Bubble::Update(float timeStep)
 {
-    if (!empty_){
-//        rigidBody_->ApplyForce((catchable_->GetNode()->GetWorldPosition() - node_->GetPosition()) * timeStep * 4200.0f * rigidBody_->GetMass());
+    Container::Update(timeStep);
+
+    if (!IsEmpty()){
+        rigidBody_->ApplyForce((node_->GetChild(static_cast<unsigned>(0))->GetWorldPosition() - node_->GetPosition()) * timeStep * 420.0f * rigidBody_->GetMass());
     } else {
         rigidBody_->ApplyTorque(Vector3(13.0f * timeStep, 23.0f * timeStep, 34.0f * timeStep));
     }
@@ -100,16 +99,15 @@ void Bubble::HandleNodeCollisionStart(StringHash eventType, VariantMap& eventDat
     /*float contactDistance{*/contacts.ReadFloat();//};
     float contactImpulse{contacts.ReadFloat()};
 
-    //Catch the catchable
-    if (empty_ && contactImpulse > 0.5f && otherNode->HasComponent<Catchable>()) {
+    //Try to contain if catchable
+    if (IsEmpty() && contactImpulse > 0.5f && otherNode->HasComponent<Catchable>()) {
 
         float otherMass{otherBody->GetMass()};
         Catchable* catchable{otherNode->GetComponent<Catchable>()};
-        if (catchable->Catch(this)){
-            empty_ = false;
-            catchable_ = catchable;
+        if (Contain(catchable)) {
+
             UpdateRigidBody(otherMass);
-            EM->TransformTo(node_,
+            FX->TransformTo(node_,
                             0.5f * (node_->GetPosition() + catchable->GetNode()->GetWorldPosition()),
                             node_->GetRotation(), 0.1f);
             return;

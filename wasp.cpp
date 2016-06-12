@@ -41,10 +41,10 @@ void Wasp::RegisterObject(Context* context)
 void Wasp::OnNodeSet(Node *node)
 {   Flyer::OnNodeSet(node);
 
-    node_->CreateComponent<Catchable>();
-    SubscribeToEvent(node_, E_CATCH, URHO3D_HANDLER(Wasp, Catched));
-    SubscribeToEvent(node_, E_RELEASE, URHO3D_HANDLER(Wasp, Released));
-
+    Catchable*  catchable{node_->CreateComponent<Catchable>()};
+    catchable->SetReleaseTime(23.0f);
+    SubscribeToEvent(node_, E_CATCH, URHO3D_HANDLER(Wasp, OnCatched));
+    SubscribeToEvent(node_, E_RELEASE, URHO3D_HANDLER(Wasp, OnReleased));
 
     node_->Translate(Quaternion(Random(360.0f), Vector3::UP) * Random(2.0f) * Vector3::FORWARD + Vector3::UP * Random(3.0f, 5.0f));
     node_->Rotate(Quaternion(Random(360.0f), Vector3::UP));
@@ -59,26 +59,25 @@ void Wasp::OnNodeSet(Node *node)
 
     animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.0f);
     animCtrl_->SetStartBone("Models/Wasp_Fly.ani", "RootBone");
-    animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 5.0f);
+    animCtrl_->SetTime("Models/Wasp_Fly.ani", randomizer_);
 }
 
 void Wasp::Update(float timeStep)
 {
     move_ = Quaternion(5.0f, Vector3::UP) * node_->GetDirection();
     Flyer::Update(timeStep);
+    animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 1.0f + rigidBody_->GetLinearVelocity().Length());
 //    model_->GetMaterial()->SetShaderParameter("MatEmissiveColor", Color::RED * MC->Sine(2.3f, 0.0f, 0.5f, randomizer_));
 }
 
-void Wasp::Catched(StringHash eventType, VariantMap& eventData)
+void Wasp::OnCatched(StringHash eventType, VariantMap& eventData)
 { (void)eventType; (void)eventData;
 
-
-    animCtrl_->StopAll();
-    animCtrl_->PlayExclusive("Models/Wasp_Caught.ani", 1, true, 0.23f);
+    animCtrl_->PlayExclusive("Models/Wasp_Caught.ani", 0, true, 0.1f);
     animCtrl_->SetStartBone("Models/Wasp_Caught.ani", "RootBone");
 
 }
-void Wasp::Released(StringHash eventType, VariantMap& eventData)
+void Wasp::OnReleased(StringHash eventType, VariantMap& eventData)
 { (void)eventType; (void)eventData;
 
     animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.0f);

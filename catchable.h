@@ -23,7 +23,7 @@
 #include <Urho3D/Urho3D.h>
 #include "luckey.h"
 
-class Bubble;
+class Container;
 
 class Catchable : public LogicComponent
 {
@@ -31,17 +31,15 @@ class Catchable : public LogicComponent
 public:
     Catchable(Context* context);
     static void RegisterObject(Context *context);
-    bool IsCaught() const { return caught_; }
-    bool Catch(Bubble* bubble);
-    void Release();
+
+    void  SetReleaseTime(float time) { releaseTime_ = time; }
+    float GetReleaseTime() { return releaseTime_; }
+    bool  IsCaught() const { return caught_; }
+    bool  Catch(Container* container);
+    void  Release();
 private:
     bool caught_;
+    float releaseTime_;
 };
-
-URHO3D_EVENT(E_CATCH, Catch)
-{
-    URHO3D_PARAM(P_NODE, Node);
-}
-URHO3D_EVENT(E_RELEASE, Release){}
 
 #endif // CATCHABLE_H

@@ -17,29 +17,38 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef BUBBLE_H
-#define BUBBLE_H
+#ifndef CONTAINER_H
+#define CONTAINER_H
 
 #include <Urho3D/Urho3D.h>
-#include "container.h"
-
-#define BUBBLE_WEIGHT 0.1f
+#include "luckey.h"
 
 class Catchable;
 
-class Bubble : public Container
+class Container : public LogicComponent
 {
-    URHO3D_OBJECT(Bubble, Container);
+    URHO3D_OBJECT(Container, LogicComponent);
 public:
-    Bubble(Context* context);
-    static void RegisterObject(Context* context);
-
+    Container(Context* context);
     virtual void OnNodeSet(Node* node);
+    virtual void Update(float timeStep);
 
-    void Update(float timeStep);
-    void HandleNodeCollisionStart(StringHash eventType, VariantMap& eventData);
+    bool IsEmpty() const { return empty_; }
+protected:
+    bool Contain(Catchable* catchable);
+    SharedPtr<StaticModel> model_;
+    SharedPtr<RigidBody> rigidBody_;
+    SharedPtr<CollisionShape> collider_;
+
+    void Release();
 private:
-    void UpdateRigidBody(float otherMass = 0.0f);
+    Catchable* catchable_;
+
+    bool empty_;
+    bool escapable_;
+
+    float containTime_;
+    float sinceContain_;
 };
 
-#endif // BUBBLE_H
+#endif // CONTAINER_H

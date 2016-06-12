@@ -1,34 +1,45 @@
-Portals (Teleporting doors)
+The sea isn't the place it used to be (pollution, mutants, weak fish) and when Blip 'n Blup narrowly avoid a sinking ship - which turns out to be loaded with shoes - they decide to walk out.  
+All their lives they've been bombarded with trash from above and wish to find the highest place, where there is no above.
 
-Double jump, second is aimed by its timing during the first.
+- Portals (Teleporting doors)
+- Pits (Make things disappear)
+- Double jump, second is aimed by its timing during the first.
+- Angry creatures on bubble escape (float cooldown)
 
-- Adventure Levels and Worlds:
-    * Beach
-    * Jungle
-    * Leafy forest
-    * Prickly forest
-    * Snowy peaks
-    * Lost temple
-    * Volcano
-    * Spaceship
-- Alien boss
-- Multiplayer Gamemodes:
-    * Capture the flag (pushing flag bubble)
-    * Football
-    * Collector
-    * Survival (waves of creatures)
-+ Angry creatures on bubble escape
-    @ Anger as float with cooldown  <---
+## Worlds
 
-Controller support
+* Beach/Jungle | 1:Landing
+   + Worms
+   + Crabs
+   + Frogs
+* Leafy forest/Prickly forest | 2:
+   + Wasps
+   + Spiders
+* Rocky hills/Snowy peaks | 3:
+* Volcano/Lost temple | 4:
+   + Gnomes
+* Spaceship | 5:Liftoff
+   - Spoon
 
-#### Inspiration
+## Multiplayer Gamemodes
+
+* **_Capture the bug_** (CTF)
+* Footbubble
+* Collector
+* Survival (waves of creatures)
+
+## Quotes
+
+### Sa'Tong Sterneal
+> "I'm such an S"
+
+### Spoon
+> "I am that I am not"
+
+## Inspiration
 
 - Bubble Bobble
 - Super Mario War
 - Golf
 
-
-##### Quotes
-##### Sa'Tong
-> "I'm such an S"
+- Wall-E

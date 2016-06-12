@@ -18,11 +18,12 @@
 */
 
 #include "catchable.h"
-#include "bubble.h"
+#include "container.h"
 #include "effectmaster.h"
 
 Catchable::Catchable(Context* context) : LogicComponent(context),
-    caught_{false}
+    caught_{false},
+    releaseTime_{1.0f}
 {
 }
 
@@ -31,7 +32,7 @@ void Catchable::RegisterObject(Context* context)
     context->RegisterFactory<Catchable>();
 }
 
-bool Catchable::Catch(Bubble* bubble)
+bool Catchable::Catch(Container* container)
 {
 
     if (!caught_){
@@ -39,12 +40,11 @@ bool Catchable::Catch(Bubble* bubble)
         if (node_->HasComponent<RigidBody>()){
             node_->GetComponent<RigidBody>()->SetEnabled(false);
         }
-        node_->SetParent(bubble->GetNode());
-        EM->TransformTo(node_, Vector3::ZERO, node_->GetRotation(), 0.23f);
-        return true;
+        node_->SetParent(container->GetNode());
+        FX->TransformTo(node_, Vector3::ZERO, node_->GetRotation(), 0.23f);
 
-        VariantMap eventData{};
         node_->SendEvent(E_CATCH);
+        return true;
     }
     return false;
 }
@@ -52,8 +52,15 @@ void Catchable::Release()
 {
 
     if (caught_){
-        node_->SetParent(MC->GetScene());
         caught_ = false;
+
+        if (node_->HasComponent<RigidBody>()){
+            node_->GetComponent<RigidBody>()->SetEnabled(true);
+        }
+        node_->SetParent(MC->GetScene());
+        FX->RotateTo(node_, Quaternion::IDENTITY, 0.42f);
+
         node_->SendEvent(E_RELEASE);
     }
 }
+

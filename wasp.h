@@ -33,8 +33,8 @@ public:
     virtual void OnNodeSet(Node* node);
     virtual void Update(float timeStep);
 private:
-    void Released(StringHash eventType, VariantMap& eventData);
-    void Catched(StringHash eventType, VariantMap& eventData);
+    void OnReleased(StringHash eventType, VariantMap& eventData);
+    void OnCatched(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // WASP_H

@@ -67,11 +67,18 @@ void EffectMaster::FadeOut(SoundSource* soundSource, float duration)
 
 void EffectMaster::TransformTo(Node* node, Vector3 pos, Quaternion rot, float duration)
 {
+    TranslateTo(node, pos, duration);
+    RotateTo(node, rot, duration);
+}
+void EffectMaster::TranslateTo(Node* node, Vector3 pos, float duration)
+{
     ValueAnimation* posAnim{new ValueAnimation(context_)};
     posAnim->SetKeyFrame(0.0f, node->GetPosition());
     posAnim->SetKeyFrame(duration, pos);
     node->SetAttributeAnimation("Position", posAnim, WM_ONCE);
-
+}
+void EffectMaster::RotateTo(Node* node, Quaternion rot, float duration)
+{
     ValueAnimation* rotAnim{new ValueAnimation(context_)};
     rotAnim->SetKeyFrame(0.0f, node->GetRotation());
     rotAnim->SetKeyFrame(duration, rot);

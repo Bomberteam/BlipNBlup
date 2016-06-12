@@ -23,6 +23,7 @@
 
 #include <Urho3D/Urho3D.h>
 #include "luckey.h"
+#include "gameevents.h"
 
 using namespace Urho3D;
 
@@ -60,7 +61,7 @@ StringHash const N_CURSOR = StringHash("Cursor");
 }
 
 #define RM GetSubsystem<ResourceMaster>()
-#define EM GetSubsystem<EffectMaster>()
+#define FX GetSubsystem<EffectMaster>()
 
 class MasterControl : public Application
 {

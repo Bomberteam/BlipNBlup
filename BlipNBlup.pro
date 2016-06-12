@@ -31,7 +31,8 @@ SOURCES += \
     wasp.cpp \
     resourcemaster.cpp \
     effectmaster.cpp \
-    catchable.cpp
+    catchable.cpp \
+    container.cpp
 
 HEADERS += \
     luckey.h \
@@ -48,4 +49,6 @@ HEADERS += \
     wasp.h \
     resourcemaster.h \
     effectmaster.h \
-    catchable.h
+    catchable.h \
+    gameevents.h \
+    container.h

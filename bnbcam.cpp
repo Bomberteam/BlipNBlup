@@ -65,6 +65,7 @@ void BnBCam::SetupViewport()
 }
 
 void BnBCam::Update(float timeStep)
-{
-//    node_->LookAt(MC->GetBlip()->GetNode()->GetPosition());
+{ (void)timeStep;
+
+    node_->LookAt(MC->GetBlip()->GetNode()->GetPosition());
 }
