@@ -37,8 +37,8 @@ void Bubble::OnNodeSet(Node *node)
     node_->CreateComponent<Wind>();
 
     node_->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
-    node_->SetScale(0.8f);
-    FX->ScaleTo(node_, 1.0f, 0.05f);
+    node_->SetScale(0.7f);
+    FX->ScaleTo(node_, 1.0f, 0.1f);
 
     model_->SetModel(RM->GetModel("Bubble"));
     model_->SetMaterial(RM->GetMaterial("Bubble"));

@@ -31,20 +31,24 @@ class Controllable : public LogicComponent
 public:
     Controllable(Context* context);
     virtual void OnNodeSet(Node* node);
+    virtual void Update(float timeStep);
+
+    void SetMove(Vector3 move);
 protected:
     float randomizer_;
     bool controlled_;
     Vector3 move_;
     Vector3 aim_;
+    float maxPitch_;
+    float minPitch_;
+
     std::bitset<4> actions_;
+    HashMap<int, float> actionSince_;
 
     AnimatedModel* model_;
     RigidBody* rigidBody_;
     CollisionShape* collider_;
     AnimationController* animCtrl_;
-
-    float maxPitch_;
-    float minPitch_;
 
     void ResetInput() { move_ = aim_ = Vector3::ZERO; actions_.reset(); }
     void SetActions(std::bitset<4> actions);

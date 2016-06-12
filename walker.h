@@ -38,6 +38,7 @@ protected:
 
 
     bool onGround_;
+    float maxSlope_;
     bool doubleJumper_;
     bool doubleJumped_;
     float jumpInterval_;

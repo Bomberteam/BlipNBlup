@@ -58,6 +58,7 @@ InputMaster::InputMaster(Context* context) : Object(context)
     buttonBindingsPlayer_[1][SB_SQUARE]     = PlayerInputAction::RUN;
     buttonBindingsPlayer_[1][SB_CROSS]      = PlayerInputAction::JUMP;
     buttonBindingsPlayer_[1][SB_CIRCLE]     = PlayerInputAction::BUBBLE;
+    buttonBindingsPlayer_[1][SB_TRIANGLE]   = PlayerInputAction::KICK;
 
     buttonBindingsPlayer_[2][SB_DPAD_UP]    = PlayerInputAction::FORWARD;
     buttonBindingsPlayer_[2][SB_DPAD_DOWN]  = PlayerInputAction::BACK;
@@ -66,11 +67,13 @@ InputMaster::InputMaster(Context* context) : Object(context)
     buttonBindingsPlayer_[2][SB_SQUARE]     = PlayerInputAction::RUN;
     buttonBindingsPlayer_[2][SB_CROSS]      = PlayerInputAction::JUMP;
     buttonBindingsPlayer_[2][SB_CIRCLE]     = PlayerInputAction::BUBBLE;
+    buttonBindingsPlayer_[2][SB_TRIANGLE]   = PlayerInputAction::KICK;
 
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(InputMaster, HandleKeyDown));
     SubscribeToEvent(E_KEYUP, URHO3D_HANDLER(InputMaster, HandleKeyUp));
     SubscribeToEvent(E_JOYSTICKBUTTONDOWN, URHO3D_HANDLER(InputMaster, HandleJoyButtonDown));
     SubscribeToEvent(E_JOYSTICKBUTTONUP, URHO3D_HANDLER(InputMaster, HandleJoyButtonUp));
+    SubscribeToEvent(E_JOYSTICKAXISMOVE, URHO3D_HANDLER(InputMaster, HandleJoystickAxisMove));
     SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(InputMaster, HandleUpdate));
 }
 
@@ -146,14 +149,18 @@ void InputMaster::HandleActions(const InputActions& actions)
         Controllable* controlled{controlledByPlayer_[p]};
         if (controlled){
 
-            controlled->move_ = GetMoveFromActions(playerInputActions);
+            Vector3 stickMove{ Vector3(leftStickPosition_[p-1].x_, 0.0f, leftStickPosition_[p-1].y_) };
+            CorrectForCameraYaw(stickMove);
 
-            std::bitset<4>otherActions{};
-            otherActions[0] = playerInputActions->Contains(PlayerInputAction::RUN);
-            otherActions[1] = playerInputActions->Contains(PlayerInputAction::JUMP);
-            otherActions[2] = playerInputActions->Contains(PlayerInputAction::BUBBLE);
+            controlled->SetMove(GetMoveFromActions(playerInputActions) + stickMove);
 
-            controlled->SetActions(otherActions);
+            std::bitset<4>restActions{};
+            restActions[0] = playerInputActions->Contains(PlayerInputAction::RUN);
+            restActions[1] = playerInputActions->Contains(PlayerInputAction::JUMP);
+            restActions[2] = playerInputActions->Contains(PlayerInputAction::BUBBLE);
+            restActions[3] = playerInputActions->Contains(PlayerInputAction::KICK);
+
+            controlled->SetActions(restActions);
         }
     }
 }
@@ -241,11 +248,11 @@ void InputMaster::HandleJoystickAxisMove(StringHash eventType, VariantMap& event
     if (axis == 0){
         leftStickPosition_[joystickId].x_ = position;
     } else if (axis == 1) {
-        leftStickPosition_[joystickId].y_ = position;
+        leftStickPosition_[joystickId].y_ = -position;
     } else if (axis == 2) {
         rightStickPosition_[joystickId].x_ = position;
     } else if (axis == 3) {
-        rightStickPosition_[joystickId].y_ = position;
+        rightStickPosition_[joystickId].y_ = -position;
     }
 }
 

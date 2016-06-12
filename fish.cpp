@@ -61,9 +61,9 @@ void Fish::BecomeBlup()
 }
 void Fish::Update(float timeStep)
 {
-    sinceBubble_ += timeStep;
-
     Walker::Update(timeStep);
+
+    sinceBubble_ += timeStep;
 }
 
 void Fish::HandleAction(int actionId)

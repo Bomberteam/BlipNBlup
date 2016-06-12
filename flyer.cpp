@@ -42,6 +42,8 @@ void Flyer::OnNodeSet(Node* node)
 
 void Flyer::Update(float timeStep)
 {
+    Controllable::Update(timeStep);
+
     if (node_->HasComponent<Catchable>()
      && node_->GetComponent<Catchable>()->IsCaught())
         return;

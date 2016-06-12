@@ -25,9 +25,18 @@ Controllable::Controllable(Context* context) : LogicComponent(context),
     move_{},
     aim_{},
     maxPitch_{90.0f},
-    minPitch_{0.0f}
-{
+    minPitch_{0.0f},
 
+    actions_{},
+    actionSince_{},
+
+    model_{},
+    rigidBody_{},
+    collider_{},
+    animCtrl_{}
+{
+    for (int a{0}; a < 4; ++a)
+        actionSince_[a] = 0.0f;
 }
 void Controllable::OnNodeSet(Node *node)
 { (void)node;
@@ -39,6 +48,21 @@ void Controllable::OnNodeSet(Node *node)
 
     model_->SetCastShadows(true);
 }
+void Controllable::Update(float timeStep)
+{
+    for (int a{0}; a < static_cast<int>(actions_.size()); ++a){
+
+        if (actions_[a])
+            actionSince_[a] += timeStep;
+    }
+}
+
+void Controllable::SetMove(Vector3 move)
+{
+    if (move.Length() > 1.0f)
+        move.Normalize();
+    move_ = move;
+}
 
 void Controllable::SetActions(std::bitset<4> actions)
 {
@@ -46,10 +70,14 @@ void Controllable::SetActions(std::bitset<4> actions)
         return;
     else
         for (int i{0}; i < static_cast<int>(actions.size()); ++i){
-            if (actions[i]!=actions_[i]){
+
+            if (actions[i] != actions_[i]){
+                actions_[i] = actions[i];
+
                 if (actions[i])
                     HandleAction(i);
-                actions_[i]=actions[i];
+                else
+                    actionSince_[i] = 0.0f;
             }
         }
 }
@@ -80,6 +108,7 @@ void Controllable::ClampPitch(Quaternion& rot)
     float maxCorrection{rot.EulerAngles().x_ - maxPitch_};
     if (maxCorrection > 0.0f)
         rot = Quaternion(-maxCorrection, node_->GetRight()) * rot;
+
     float minCorrection{rot.EulerAngles().x_ - minPitch_};
     if (minCorrection < 0.0f)
         rot = Quaternion(-minCorrection, node_->GetRight()) * rot;

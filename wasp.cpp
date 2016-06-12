@@ -75,6 +75,7 @@ void Wasp::Update(float timeStep)
 
     model_->GetMaterial()->SetShaderParameter("MatEmissiveColor", Color::RED * MC->Sine(2.3f, 0.0f, 0.5f * rage_->GetAnger(), randomizer_));
     maxFlySpeed_ = 13.0f + 7.0f * rage_->GetAnger();
+    flyThrust_ = 500.0f + 200.0f * rage_->GetAnger();
 }
 
 void Wasp::OnCatched(StringHash eventType, VariantMap& eventData)

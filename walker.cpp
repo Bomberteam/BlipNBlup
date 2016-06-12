@@ -22,6 +22,7 @@
 
 Walker::Walker(Context* context) : Controllable(context),
     onGround_{false},
+    maxSlope_{45.0f},
     doubleJumper_{false},
     doubleJumped_{false},
     sinceJump_{0.0f}
@@ -47,11 +48,13 @@ void Walker::OnNodeSet(Node *node)
 
 void Walker::Update(float timeStep)
 {
+    Controllable::Update(timeStep);
+
     sinceJump_ += timeStep;
 
-    bool run{actions_[0] * onGround_};
-    float maxWalkSpeed{maxRunSpeed_ * (0.6f + 0.4f * run)};
-    float walkThrust{runThrust_ * (0.8f + 0.2f * run)};
+    float run{ Clamp(2.3f * actionSince_[0], 0.0f, 1.0f) * onGround_ };
+    float maxWalkSpeed{ maxRunSpeed_ * (0.6f + 0.4f * run) };
+    float walkThrust{ runThrust_ * (0.8f + 0.2f * run) };
 
     PODVector<RigidBody*> bodies{};
     rigidBody_->GetCollidingBodies(bodies);
@@ -69,10 +72,11 @@ void Walker::Update(float timeStep)
         if (planarVelocity.Length() <= maxWalkSpeed
          || planarVelocity.DotProduct(force) < 0.0f)
         {
-            float remainingSpeed{Clamp(
+            float remainingSpeed{ Min(
                             maxWalkSpeed - planarVelocity.Length() * (1.0f-(planarVelocity.Angle(force)/90.0f)),
-                            0.0f, maxWalkSpeed)};
-            float maxThrust = Max(walkThrust * remainingSpeed, 0.0f);
+                            maxWalkSpeed)};
+
+            float maxThrust = Max(walkThrust * remainingSpeed * rigidBody_->GetMass(), 0.0f);
             if (force.Length() > maxThrust)
                 force = force.Normalized() * maxThrust;
 
@@ -112,7 +116,7 @@ void Walker::CheckOnGround(MemoryBuffer& contacts)
         /*float contactDistance = */contacts.ReadFloat();
         /*float contactImpulse = */contacts.ReadFloat();
 
-        if ((node_->GetPosition().y_ - contactPosition.y_) > collider_->GetSize().x_/2.0f
+        if (contactNormal.Angle(Vector3::DOWN) < maxSlope_
          && sinceJump_ > jumpInterval_){
 
             onGround_ = true;
