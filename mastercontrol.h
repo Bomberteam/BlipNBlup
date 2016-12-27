@@ -32,17 +32,10 @@ class EffectMaster;
 class InputMaster;
 class BnBCam;
 class Fish;
+class Block;
 
-typedef struct GameWorld {
-
-    SharedPtr<Node> voidNode;
-    struct {
-        SharedPtr<Node> sceneCursor;
-        SharedPtr<Cursor> uiCursor;
-        PODVector<RayQueryResult> hitResults;
-    } cursor;
-
-} GameWorld;
+#define RM GetSubsystem<ResourceMaster>()
+#define FX GetSubsystem<EffectMaster>()
 
 typedef struct HitInfo {
 
@@ -60,16 +53,12 @@ StringHash const N_VOID = StringHash("Void");
 StringHash const N_CURSOR = StringHash("Cursor");
 }
 
-#define RM GetSubsystem<ResourceMaster>()
-#define FX GetSubsystem<EffectMaster>()
 
 class MasterControl : public Application
 {
     URHO3D_OBJECT(MasterControl, Application);
 public:
     MasterControl(Context* context);
-
-    GameWorld world_;
 
     Vector<int> GetPlayers() const {
         Vector<int> players;
@@ -99,6 +88,7 @@ private:
 
     SharedPtr<BnBCam> camera_;
     SharedPtr<Scene> scene_;
+    HashMap<int, HashMap<IntVector2, Block*>> blockMap_;
 
     SharedPtr<Fish> blip_;
     SharedPtr<Fish> blup_;
@@ -107,6 +97,8 @@ private:
     void CreateScene();
     void CreateUI();
     void SubscribeToEvents();
+
+    void LoadBlockMap(String fileName);
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 

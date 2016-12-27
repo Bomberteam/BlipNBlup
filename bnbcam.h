@@ -17,8 +17,8 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef COURSECAM_H
-#define COURSECAM_H
+#ifndef BNBCAM_H
+#define BNBCAM_H
 
 #include <Urho3D/Urho3D.h>
 
@@ -46,4 +46,4 @@ private:
     void SetupViewport();
 };
 
-#endif // TEMPLATECAM_H
+#endif // BNBCAM_H

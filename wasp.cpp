@@ -68,7 +68,7 @@ void Wasp::OnNodeSet(Node *node)
 
 void Wasp::Update(float timeStep)
 {
-    move_ = Quaternion(5.0f + 3.0f * rage_->GetAnger(), Vector3::UP) * node_->GetDirection(); ///Should be handled by AI component
+    move_ = Quaternion(5.0f - 2.0f * rage_->GetAnger(), Vector3::UP) * node_->GetDirection(); ///Should be handled by AI component
 
     Flyer::Update(timeStep);
     animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 1.0f + rigidBody_->GetLinearVelocity().Length());

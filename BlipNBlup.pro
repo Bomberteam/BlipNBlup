@@ -33,7 +33,8 @@ SOURCES += \
     effectmaster.cpp \
     catchable.cpp \
     container.cpp \
-    rage.cpp
+    rage.cpp \
+    block.cpp
 
 HEADERS += \
     luckey.h \
@@ -53,4 +54,5 @@ HEADERS += \
     catchable.h \
     gameevents.h \
     container.h \
-    rage.h
+    rage.h \
+    block.h

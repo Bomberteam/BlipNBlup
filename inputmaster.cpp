@@ -58,7 +58,7 @@ InputMaster::InputMaster(Context* context) : Object(context)
     buttonBindingsPlayer_[1][SB_SQUARE]     = PlayerInputAction::RUN;
     buttonBindingsPlayer_[1][SB_CROSS]      = PlayerInputAction::JUMP;
     buttonBindingsPlayer_[1][SB_CIRCLE]     = PlayerInputAction::BUBBLE;
-    buttonBindingsPlayer_[1][SB_TRIANGLE]   = PlayerInputAction::KICK;
+    buttonBindingsPlayer_[1][SB_TRIANGLE]   = PlayerInputAction::INTERACT;
 
     buttonBindingsPlayer_[2][SB_DPAD_UP]    = PlayerInputAction::FORWARD;
     buttonBindingsPlayer_[2][SB_DPAD_DOWN]  = PlayerInputAction::BACK;
@@ -67,7 +67,7 @@ InputMaster::InputMaster(Context* context) : Object(context)
     buttonBindingsPlayer_[2][SB_SQUARE]     = PlayerInputAction::RUN;
     buttonBindingsPlayer_[2][SB_CROSS]      = PlayerInputAction::JUMP;
     buttonBindingsPlayer_[2][SB_CIRCLE]     = PlayerInputAction::BUBBLE;
-    buttonBindingsPlayer_[2][SB_TRIANGLE]   = PlayerInputAction::KICK;
+    buttonBindingsPlayer_[2][SB_TRIANGLE]   = PlayerInputAction::INTERACT;
 
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(InputMaster, HandleKeyDown));
     SubscribeToEvent(E_KEYUP, URHO3D_HANDLER(InputMaster, HandleKeyUp));
@@ -158,7 +158,7 @@ void InputMaster::HandleActions(const InputActions& actions)
             restActions[0] = playerInputActions->Contains(PlayerInputAction::RUN);
             restActions[1] = playerInputActions->Contains(PlayerInputAction::JUMP);
             restActions[2] = playerInputActions->Contains(PlayerInputAction::BUBBLE);
-            restActions[3] = playerInputActions->Contains(PlayerInputAction::KICK);
+            restActions[3] = playerInputActions->Contains(PlayerInputAction::INTERACT);
 
             controlled->SetActions(restActions);
         }

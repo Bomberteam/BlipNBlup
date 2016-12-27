@@ -32,7 +32,7 @@ class Sprite;
 }
 
 enum class MasterInputAction { UP, RIGHT, DOWN, LEFT, CONFIRM, CANCEL, PAUSE, MENU, SCREENSHOT };
-enum class PlayerInputAction { FORWARD, BACK, LEFT, RIGHT, UP, DOWN, RUN, JUMP, BUBBLE, KICK };
+enum class PlayerInputAction { FORWARD, BACK, LEFT, RIGHT, UP, DOWN, RUN, JUMP, BUBBLE, INTERACT };
 
 struct InputActions {
     Vector<MasterInputAction> master_;
