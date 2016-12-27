@@ -55,7 +55,7 @@ void MasterControl::Setup()
     engineParameters_[EP_RESOURCE_PATHS] = "Data;CoreData;Resources";
     engineParameters_[EP_WINDOW_ICON] = "icon.png";
 
-    engineParameters_[EP_FULL_SCREEN] = false;
+//    engineParameters_[EP_FULL_SCREEN] = false;
 }
 void MasterControl::Start()
 {

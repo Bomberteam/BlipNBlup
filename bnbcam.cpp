@@ -67,5 +67,23 @@ void BnBCam::SetupViewport()
 void BnBCam::Update(float timeStep)
 { (void)timeStep;
 
-    node_->LookAt(MC->GetBlip()->GetNode()->GetPosition());
+    float distance{ 9.0f };
+    Vector3 targetPos{ MC->GetBlip()->GetNode()->GetPosition() };
+    float targetDistance{ LucKey::Distance(node_->GetPosition(), targetPos) };
+    float minAltDelta{ 5.0f };
+    float maxAltDelta{ 7.0f };
+
+    float altDelta{ node_->GetPosition().y_ - targetPos.y_ };
+    if (node_->GetPosition().y_ - targetPos.y_ < minAltDelta) {
+        node_->Translate(Vector3::UP * (minAltDelta - altDelta) * timeStep * 5.0f, TS_WORLD);
+    } else if (node_->GetPosition().y_ - targetPos.y_ > maxAltDelta) {
+        node_->Translate(Vector3::DOWN * (maxAltDelta - altDelta) * timeStep * 5.0f, TS_WORLD);
+    }
+
+    node_->LookAt(targetPos);
+    if (targetDistance != distance) {
+        node_->Translate(Vector3::FORWARD * (targetDistance - distance));
+    }
+
+
 }

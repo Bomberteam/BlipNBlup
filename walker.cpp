@@ -116,7 +116,7 @@ void Walker::CheckOnGround(MemoryBuffer& contacts)
         /*float contactDistance = */contacts.ReadFloat();
         /*float contactImpulse = */contacts.ReadFloat();
 
-        if (contactNormal.Angle(Vector3::DOWN) < maxSlope_
+        if (contactNormal.Angle(Vector3::UP) < maxSlope_
          && sinceJump_ > jumpInterval_){
 
             onGround_ = true;
