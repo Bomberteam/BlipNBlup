@@ -33,3 +33,14 @@ bool CastMaster::PhysicsRayCast(PODVector<PhysicsRaycastResult> &hitResults, con
 
     return (hitResults.Size() > 0);
 }
+
+bool CastMaster::PhysicsSphereCast(PhysicsRaycastResult &hitResult, const Ray ray,
+                                const float radius, const float distance, const unsigned collisionMask)
+{
+    if (radius > 1.0e-9)
+        MC->GetScene()->GetComponent<PhysicsWorld>()->SphereCast(hitResult, ray, radius, distance, collisionMask);
+
+    return hitResult.body_ != nullptr;
+}
+
+

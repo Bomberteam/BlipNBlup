@@ -30,6 +30,7 @@ public:
     ResourceMaster(Context* context);
     Model*GetModel(String model);
     Material*GetMaterial(String material);
+    Sound*GetSample(String sample);
 };
 
 #endif // RESOURCEMASTER_H

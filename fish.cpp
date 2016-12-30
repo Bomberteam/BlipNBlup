@@ -23,9 +23,10 @@
 
 Fish::Fish(Context *context) : Walker(context),
     bubbleInterval_{0.5f},
-    sinceBubble_{bubbleInterval_}
+    sinceBubble_{bubbleInterval_},
+    blink_{}
 {
-    runThrust_ = 34000.0f;
+    runThrust_ = 23500.0f;
     maxRunSpeed_ = 5.0f;
 
     jumpForce_ = 34.0f;
@@ -33,7 +34,11 @@ Fish::Fish(Context *context) : Walker(context),
     sinceJump_ = jumpInterval_;
     doubleJumper_ = true;
 
-    SetUpdateEventMask(USE_UPDATE);
+    idleAnim_ = "Models/Idle.ani";
+    walkAnim_ = "Models/Walk.ani";
+    midairAnim_ = "Models/Midair.ani";
+
+//    SetUpdateEventMask(USE_UPDATE);
 }
 
 void Fish::RegisterObject(Context* context)
@@ -43,10 +48,13 @@ void Fish::RegisterObject(Context* context)
 
 void Fish::OnNodeSet(Node *node)
 { (void)node;
+
     Walker::OnNodeSet(node);
 
     model_->SetModel(RM->GetModel("Blip"));
     model_->SetMaterial(RM->GetMaterial("VCol"));
+
+    model_->GetNode()->SetPosition(Vector3::DOWN * 0.523f);
 
     rigidBody_->SetCollisionLayer(LAYER(1));
     rigidBody_->SetCollisionMask(M_MAX_UNSIGNED);
@@ -57,13 +65,26 @@ void Fish::OnNodeSet(Node *node)
 void Fish::BecomeBlup()
 {
     model_->SetModel(RM->GetModel("Blup"));
+    model_->SetMorphWeight(1, 1.0f);
     node_->Translate(Vector3::RIGHT);
 }
+
 void Fish::Update(float timeStep)
 {
     Walker::Update(timeStep);
 
     sinceBubble_ += timeStep;
+
+    //Blink
+    model_->SetMorphWeight(0, Lerp(model_->GetMorphWeight(0), 0.0f, Clamp(timeStep * 13.0f, 0.0f, 1.0f)));
+    blink_ -= timeStep;
+
+    if (blink_ < 0.0f) {
+        blink_ = Random(1.3f, 3.2);
+
+        model_->SetMorphWeight(0, 1.0f);
+    }
+
 }
 
 void Fish::HandleAction(int actionId)
@@ -83,14 +104,21 @@ void Fish::HandleAction(int actionId)
 
 void Fish::BlowBubble()
 {
-    if (sinceBubble_ > bubbleInterval_){
+    if (sinceBubble_ > bubbleInterval_) {
         sinceBubble_ = 0.0f;
 
-        Node* bubbleNode{MC->GetScene()->CreateChild("Bubble")};
+        Node* bubbleNode{ MC->GetScene()->CreateChild("Bubble") };
         bubbleNode->SetPosition(node_->GetPosition() + node_->GetDirection() * 0.1f);
         bubbleNode->CreateComponent<Bubble>();
-        RigidBody* bubbleBody{bubbleNode->GetComponent<RigidBody>()};
+        RigidBody* bubbleBody{ bubbleNode->GetComponent<RigidBody>() };
         bubbleBody->SetLinearVelocity(rigidBody_->GetLinearVelocity());
         bubbleBody->ApplyImpulse(node_->GetDirection() * 2.3f);
+
+        animCtrl_->Play("Models/Bubble.ani", 1, false, 0.05f);
+        animCtrl_->SetTime("Models/Bubble.ani", 0.0f);
+        animCtrl_->SetStartBone("Models/Bubble.ani", "Mouth");
+        model_->SetMorphWeight(0, 1.0f);
+
+        node_->GetOrCreateComponent<SoundSource>()->Play(RM->GetSample("ShootBubble"));
     }
 }

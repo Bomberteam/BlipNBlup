@@ -42,7 +42,7 @@ void Wasp::RegisterObject(Context* context)
 void Wasp::OnNodeSet(Node *node)
 {   Flyer::OnNodeSet(node);
 
-    Catchable*  catchable{node_->CreateComponent<Catchable>()};
+    Catchable*  catchable{ node_->CreateComponent<Catchable>() };
     rage_ = node_->CreateComponent<Rage>();
     rage_->SetCooldown(10.0f);
 
@@ -57,12 +57,11 @@ void Wasp::OnNodeSet(Node *node)
     model_->SetMaterial(RM->GetMaterial("VCol")->Clone());
 
     rigidBody_->SetCollisionLayer(LAYER(2));
-    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2));
+    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1));
     rigidBody_->SetMass(2.0f);
     collider_->SetSphere(1.0f);
 
-    animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.0f);
-    animCtrl_->SetStartBone("Models/Wasp_Fly.ani", "RootBone");
+    animCtrl_->Play("Models/Wasp_Fly.ani", 0, true, 0.0f);
     animCtrl_->SetTime("Models/Wasp_Fly.ani", randomizer_);
 }
 
@@ -82,7 +81,6 @@ void Wasp::OnCatched(StringHash eventType, VariantMap& eventData)
 { (void)eventType; (void)eventData;
 
     animCtrl_->PlayExclusive("Models/Wasp_Caught.ani", 0, true, 0.1f);
-    animCtrl_->SetStartBone("Models/Wasp_Caught.ani", "RootBone");
 
 }
 void Wasp::OnReleased(StringHash eventType, VariantMap& eventData)
@@ -90,8 +88,6 @@ void Wasp::OnReleased(StringHash eventType, VariantMap& eventData)
 
     rage_->FillAnger();
 
-    node_->GetComponent<Rage>()->FillAnger();
-    animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.0f);
-    animCtrl_->SetStartBone("Models/Wasp_Fly.ani", "RootBone");
+    animCtrl_->PlayExclusive("Models/Wasp_Fly.ani", 0, true, 0.1f);
     animCtrl_->SetSpeed("Models/Wasp_Fly.ani", 5.0f);
 }

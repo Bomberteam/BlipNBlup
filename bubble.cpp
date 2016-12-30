@@ -37,7 +37,6 @@ void Bubble::OnNodeSet(Node *node)
     node_->CreateComponent<Wind>();
 
     node_->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
-    node_->SetScale(0.7f);
     FX->ScaleTo(node_, 1.0f, 0.1f);
 
     model_->SetModel(RM->GetModel("Bubble"));
@@ -76,6 +75,8 @@ void Bubble::UpdateRigidBody(float otherMass)
         rigidBody_->ResetForces();
         rigidBody_->SetAngularVelocity(Vector3::ZERO);
         rigidBody_->SetLinearVelocity(Vector3::ZERO);
+        rigidBody_->SetRestitution(0.5f);
+
         rigidBody_->ReAddBodyToWorld();
     } else {
         rigidBody_->SetMass(Max(0.5f * otherMass - BUBBLE_WEIGHT, BUBBLE_WEIGHT));
@@ -85,6 +86,8 @@ void Bubble::UpdateRigidBody(float otherMass)
         rigidBody_->ResetForces();
         rigidBody_->SetAngularVelocity(Vector3::ZERO);
         rigidBody_->SetLinearVelocity(Vector3::ZERO);
+        rigidBody_->SetRestitution(1.0f);
+
         rigidBody_->ReAddBodyToWorld();
     }
 }

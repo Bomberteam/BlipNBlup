@@ -81,7 +81,7 @@ void MasterControl::Start()
     SoundSource* musicSource{scene_->CreateComponent<SoundSource>()};
     musicSource->SetGain(0.32f);
     musicSource->SetSoundType(SOUND_MUSIC);
-//    musicSource->Play(music);
+    musicSource->Play(music);
 }
 void MasterControl::Stop()
 {
@@ -157,16 +157,24 @@ void MasterControl::CreateScene()
 
     //Create a directional light to the world. Enable cascaded shadows on it
     Node* lightNode{ scene_->CreateChild("DirectionalLight") };
-    lightNode->SetPosition(Vector3(-5.0f, 10.0f, -7.0f));
+    lightNode->SetPosition(Vector3(-2.3f, 10.0f, -4.2f));
     lightNode->LookAt(Vector3(0.0f, 0.0f, 0.0f));
     Light* light{ lightNode->CreateComponent<Light>() };
     light->SetLightType(LIGHT_DIRECTIONAL);
-    light->SetBrightness(0.9f);
-    light->SetShadowIntensity(0.3f);
+    light->SetBrightness(0.5f);
+    light->SetShadowIntensity(0.23f);
     light->SetColor(Color(0.95f, 0.9f, 0.85f));
     light->SetCastShadows(true);
-    light->SetShadowBias(BiasParameters(0.000023f, 0.5f));
-    light->SetShadowCascade(CascadeParameters(7.0f, 23.0f, 42.0f, 500.0f, 0.8f));
+
+    //Create a directional light to the world. Enable cascaded shadows on it
+    Node* grassLightNode{ scene_->CreateChild("DirectionalLight") };
+    grassLightNode->SetPosition(Vector3(0.0f, -10.0f, 0.0f));
+    grassLightNode->LookAt(Vector3(0.0f, 0.0f, 0.0f));
+    Light* grassLight{ grassLightNode->CreateComponent<Light>() };
+    grassLight->SetLightType(LIGHT_DIRECTIONAL);
+    grassLight->SetBrightness(0.25f);
+//    grassLight->SetShadowIntensity(0.3f);
+    grassLight->SetColor(Color(0.05f, 0.23f, 0.13f));
 
     //Create fish
     Node* blipNode{ scene_->CreateChild("Blip") };
@@ -235,7 +243,7 @@ void MasterControl::LoadBlockMap(String fileName) {
 
     int mapWidth{ mapElem.GetInt("map_width") };
     int mapHeight{ mapElem.GetInt("map_height") };
-    int mapDepth{ mapElem.GetInt("map_deoth") };
+    int mapDepth{ mapElem.GetInt("map_depth") };
 
     Vector3 blockSize{ mapElem.GetVector3("block_size") };
 

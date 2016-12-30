@@ -44,6 +44,12 @@ protected:
     float jumpInterval_;
     float sinceJump_;
 
+    String idleAnim_;
+    String walkAnim_;
+    String runAnim_;
+    String jumpAnim_;
+    String midairAnim_;
+
     void Jump();
 
     void HandleNodeCollisionStart(StringHash eventType, VariantMap& eventData);

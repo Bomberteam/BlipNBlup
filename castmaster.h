@@ -29,6 +29,7 @@ class CastMaster : public Object
 public:
     CastMaster(Context* context);
     bool PhysicsRayCast(PODVector<PhysicsRaycastResult>& hitResults, const Ray ray, const float distance, const unsigned collisionMask);
+    bool PhysicsSphereCast(PhysicsRaycastResult& hitResult, const Ray ray, const float radius, const float distance, const unsigned collisionMask);
 };
 
 #endif // CASTMASTER_H

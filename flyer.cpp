@@ -32,7 +32,7 @@ void Flyer::OnNodeSet(Node* node)
 {
     Controllable::OnNodeSet(node);
 
-    rigidBody_->SetLinearRestThreshold(0.0f);
+    rigidBody_->SetLinearRestThreshold(0.01f);
     rigidBody_->SetLinearDamping(0.5f);
     rigidBody_->SetRestitution(0.23f);
     rigidBody_->SetAngularDamping(1.0f);

@@ -41,10 +41,11 @@ Controllable::Controllable(Context* context) : LogicComponent(context),
 void Controllable::OnNodeSet(Node *node)
 { (void)node;
 
-    model_ = node_->CreateComponent<AnimatedModel>();
+    model_ = node_->CreateChild("Model")->CreateComponent<AnimatedModel>();
+    animCtrl_ = model_->GetNode()->CreateComponent<AnimationController>();
+
     rigidBody_ = node_->CreateComponent<RigidBody>();
     collider_ = node_->CreateComponent<CollisionShape>();
-    animCtrl_ = node_->CreateComponent<AnimationController>();
 
     model_->SetCastShadows(true);
 }

@@ -19,6 +19,7 @@
 
 #include "fish.h"
 #include "bnbcam.h"
+#include "castmaster.h"
 
 BnBCam::BnBCam(Context *context):
     Controllable(context)
@@ -34,12 +35,12 @@ void BnBCam::OnNodeSet(Node *node)
 
     camera_ = node_->CreateComponent<Camera>();
     camera_->SetFarClip(1024.0f);
-    camera_->SetFov(60.0f);
+    camera_->SetFov(90.0f);
     node_->SetPosition(Vector3(0.0f, 7.0f, -10.0f));
     node_->SetRotation(Quaternion(23.0f, 0.0f, 0.0f));
 
-    Zone* zone{node_->CreateComponent<Zone>()};
-    zone->SetAmbientColor(Color(0.13f, 0.23f, 0.42f));
+    Zone* zone{ node_->CreateComponent<Zone>() };
+    zone->SetAmbientColor(Color(0.5f, 0.6f, 0.8f));
 
     SetupViewport();
 
@@ -49,7 +50,7 @@ void BnBCam::SetupViewport()
 {
 
     //Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    Viewport* viewport(new Viewport(context_, MC->GetScene(), camera_));
+    Viewport* viewport{ new Viewport(context_, MC->GetScene(), camera_) };
 
     RenderPath* effectRenderPath{viewport->GetRenderPath()};
     effectRenderPath->Append(CACHE->GetResource<XMLFile>("PostProcess/FXAA3.xml"));
@@ -65,25 +66,37 @@ void BnBCam::SetupViewport()
 }
 
 void BnBCam::Update(float timeStep)
-{ (void)timeStep;
+{
+    float t{ Clamp( 235.0f * timeStep, 0.0f, 1.0f) };
 
-    float distance{ 9.0f };
     Vector3 targetPos{ MC->GetBlip()->GetNode()->GetPosition() };
     float targetDistance{ LucKey::Distance(node_->GetPosition(), targetPos) };
-    float minAltDelta{ 5.0f };
-    float maxAltDelta{ 7.0f };
+    float distance{ Lerp(targetDistance, 6.0f, t) };
+    float minAltDelta{ 2.3f };
+    float maxAltDelta{ 5.5f };
 
     float altDelta{ node_->GetPosition().y_ - targetPos.y_ };
-    if (node_->GetPosition().y_ - targetPos.y_ < minAltDelta) {
-        node_->Translate(Vector3::UP * (minAltDelta - altDelta) * timeStep * 5.0f, TS_WORLD);
-    } else if (node_->GetPosition().y_ - targetPos.y_ > maxAltDelta) {
-        node_->Translate(Vector3::DOWN * (maxAltDelta - altDelta) * timeStep * 5.0f, TS_WORLD);
+    if (altDelta < minAltDelta) {
+        node_->Translate(Vector3::UP * (minAltDelta - altDelta) * t, TS_WORLD);
+    } else if (altDelta > maxAltDelta) {
+        node_->Translate(Vector3::UP * (maxAltDelta - altDelta) * t, TS_WORLD);
     }
 
     node_->LookAt(targetPos);
-    if (targetDistance != distance) {
-        node_->Translate(Vector3::FORWARD * (targetDistance - distance));
+
+    PhysicsRaycastResult result{};
+    Ray ray{ targetPos, (node_->GetPosition() - targetPos).Normalized() };
+    float closest{ distance };
+    if (GetSubsystem<CastMaster>()->PhysicsSphereCast(result, ray, 0.23f, distance, LAYER(0))) {
+
+        float hitDistance{ LucKey::Distance(result.position_, node_->GetPosition()) };
+        if (hitDistance < closest && hitDistance > 0.5f) {
+            closest = hitDistance;
+        }
     }
 
-
+    distance = closest;
+    if (targetDistance != distance) {
+        node_->Translate(Vector3::FORWARD * (targetDistance - distance) * t);
+    }
 }

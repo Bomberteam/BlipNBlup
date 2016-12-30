@@ -33,6 +33,8 @@ Material* ResourceMaster::GetMaterial(String material)
 {
     return CACHE->GetResource<Material>("Materials/"+material+".xml");
 }
-
-
+Sound* ResourceMaster::GetSample(String sample)
+{
+    return CACHE->GetResource<Sound>("Samples/"+sample+".ogg");
+}
 
