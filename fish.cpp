@@ -52,7 +52,7 @@ void Fish::OnNodeSet(Node *node)
     Walker::OnNodeSet(node);
 
     model_->SetModel(RM->GetModel("Blip"));
-    model_->SetMaterial(RM->GetMaterial("VCol"));
+    model_->SetMaterial(RM->GetMaterial("VColOutline"));
 
     model_->GetNode()->SetPosition(Vector3::DOWN * 0.523f);
 

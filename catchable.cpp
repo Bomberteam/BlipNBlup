@@ -32,7 +32,7 @@ void Catchable::RegisterObject(Context* context)
     context->RegisterFactory<Catchable>();
 }
 
-bool Catchable::Catch(Container* container)
+bool Catchable::CatchIn(Container* container)
 {
 
     if (!caught_){

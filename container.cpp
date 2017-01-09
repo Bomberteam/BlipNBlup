@@ -48,7 +48,10 @@ void Container::Update(float timeStep)
 
 bool Container::Contain(Catchable* catchable)
 {
-    if (catchable->Catch(this)){
+    node_->SetAttributeAnimation("scale", nullptr);
+    node_->SetScale(1.0f);
+
+    if (catchable->CatchIn(this)){
         empty_ = false;
         sinceContain_ = 0.0f;
 

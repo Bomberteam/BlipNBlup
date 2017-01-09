@@ -37,14 +37,15 @@ void Bubble::OnNodeSet(Node *node)
     node_->CreateComponent<Wind>();
 
     node_->SetRotation(Quaternion(Random(360.0f), Random(360.0f), Random(360.0f)));
+    node_->SetScale(0.7f);
     FX->ScaleTo(node_, 1.0f, 0.1f);
 
     model_->SetModel(RM->GetModel("Bubble"));
     model_->SetMaterial(RM->GetMaterial("Bubble"));
     model_->SetCastShadows(true);
 
-    rigidBody_->SetCollisionLayer(LAYER(1));
-    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2));
+    rigidBody_->SetCollisionLayer(LAYER(2));
+    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2) + LAYER(3));
     rigidBody_->SetRollingFriction(0.42f);
     rigidBody_->SetLinearRestThreshold(0.0f);
     UpdateRigidBody();
@@ -98,17 +99,17 @@ void Bubble::HandleNodeCollisionStart(StringHash eventType, VariantMap& eventDat
     RigidBody* otherBody{static_cast<RigidBody*>(eventData[NodeCollisionStart::P_OTHERBODY].GetPtr())};
     Node* otherNode{static_cast<Node*>(eventData[NodeCollisionStart::P_OTHERNODE].GetPtr())};
 
-    MemoryBuffer contacts(eventData[NodeCollision::P_CONTACTS].GetBuffer());
+    MemoryBuffer contacts{ eventData[NodeCollision::P_CONTACTS].GetBuffer() };
     /*Vector3 contactPosition{*/contacts.ReadVector3();//};
     /*Vector3 contactNormal{*/contacts.ReadVector3();//};
     /*float contactDistance{*/contacts.ReadFloat();//};
-    float contactImpulse{contacts.ReadFloat()};
+    float contactImpulse{ contacts.ReadFloat() };
 
     //Try to contain if catchable
     if (IsEmpty() && contactImpulse > 0.5f && otherNode->HasComponent<Catchable>()) {
 
         float otherMass{otherBody->GetMass()};
-        Catchable* catchable{otherNode->GetComponent<Catchable>()};
+        Catchable* catchable{ otherNode->GetComponent<Catchable>() };
         if (Contain(catchable)) {
 
             UpdateRigidBody(otherMass);

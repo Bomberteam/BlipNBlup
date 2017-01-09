@@ -81,7 +81,7 @@ void MasterControl::Start()
     SoundSource* musicSource{scene_->CreateComponent<SoundSource>()};
     musicSource->SetGain(0.32f);
     musicSource->SetSoundType(SOUND_MUSIC);
-    musicSource->Play(music);
+//    musicSource->Play(music);
 }
 void MasterControl::Stop()
 {
@@ -134,7 +134,7 @@ void MasterControl::CreateScene()
     Skybox* skybox{ skyNode->CreateComponent<Skybox>() };
     skybox->SetModel(RM->GetModel("Box"));
     skybox->SetMaterial(RM->GetMaterial("Skybox"));
-    skybox->GetMaterial()->SetShaderParameter("MatDiffColor", Color(0.5f, 0.6f, 1.0f));
+//    skybox->GetMaterial()->SetShaderParameter("MatDiffColor", Color(0.5f, 0.6f, 1.0f));
 
     //Add ground
     /*Node* groundNode{scene_->CreateChild("Ground")};
@@ -162,7 +162,7 @@ void MasterControl::CreateScene()
     Light* light{ lightNode->CreateComponent<Light>() };
     light->SetLightType(LIGHT_DIRECTIONAL);
     light->SetBrightness(0.5f);
-    light->SetShadowIntensity(0.23f);
+//    light->SetShadowIntensity(0.13f);
     light->SetColor(Color(0.95f, 0.9f, 0.85f));
     light->SetCastShadows(true);
 
@@ -247,7 +247,7 @@ void MasterControl::LoadBlockMap(String fileName) {
 
     Vector3 blockSize{ mapElem.GetVector3("block_size") };
 
-    HashMap<int, HashMap<int, String>> blockSets;
+    HashMap<int, HashMap<int, Pair<String, String>>> blockSets;
 
     XMLElement blockSetRefElem{ mapElem.GetChild("blockset") };
 
@@ -264,7 +264,8 @@ void MasterControl::LoadBlockMap(String fileName) {
         XMLElement blockElem{ blockSetElem.GetChild("block") };
         while (blockElem) {
 
-            blockSets[blockSetId][blockElem.GetInt("id")] = blockElem.GetAttribute("model");
+            blockSets[blockSetId][blockElem.GetInt("id")].first_ = blockElem.GetAttribute("model");
+            blockSets[blockSetId][blockElem.GetInt("id")].second_ = blockElem.GetAttribute("material");
 
             blockElem = blockElem.GetNext("block");
         }
@@ -281,8 +282,8 @@ void MasterControl::LoadBlockMap(String fileName) {
         blockNode->SetRotation(blockElem.GetQuaternion("rot"));
 
         Block* block{ blockNode->CreateComponent<Block>() };
-        block->Initialize(CACHE->GetResource<Model>(blockSets[blockElem.GetInt("set")][blockElem.GetInt("block")]),
-                          RM->GetMaterial("VCol"));
+        block->Initialize(CACHE->GetResource<Model>(blockSets[blockElem.GetInt("set")][blockElem.GetInt("block")].first_),
+                          CACHE->GetResource<Material>(blockSets[blockElem.GetInt("set")][blockElem.GetInt("block")].second_));
 
         blockElem = blockElem.GetNext("gridblock");
     }

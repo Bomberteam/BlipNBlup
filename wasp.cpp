@@ -54,10 +54,10 @@ void Wasp::OnNodeSet(Node *node)
     node_->Rotate(Quaternion(Random(360.0f), Vector3::UP));
 
     model_->SetModel(RM->GetModel("Wasp"));
-    model_->SetMaterial(RM->GetMaterial("VCol")->Clone());
+    model_->SetMaterial(RM->GetMaterial("VColOutline")->Clone());
 
-    rigidBody_->SetCollisionLayer(LAYER(2));
-    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1));
+    rigidBody_->SetCollisionLayer(LAYER(3));
+    rigidBody_->SetCollisionMask(LAYER(0) + LAYER(1) + LAYER(2) + LAYER(3));
     rigidBody_->SetMass(2.0f);
     collider_->SetSphere(1.0f);
 

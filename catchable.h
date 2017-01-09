@@ -38,7 +38,7 @@ public:
     void  SetReleaseTime(float time) { releaseTime_ = time; }
     float GetReleaseTime() { return releaseTime_; }
     bool  IsCaught() const { return caught_; }
-    bool  Catch(Container* container);
+    bool  CatchIn(Container* container);
     void  Release();
 private:
     bool caught_;
